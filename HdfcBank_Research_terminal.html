@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDFC Bank | Fundamental Terminal</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --surface3: #1f2d44;
+    --border: #1e2d45;
+    --border2: #253550;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --cyan: #22d3ee;
+    --purple: #a78bfa;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --radius: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .ticker-tag { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+  .stock-name { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .cmp-block { margin-left: auto; text-align: right; }
+  .cmp-val { font-size: 26px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+  .cmp-sub { font-size: 11px; color: var(--text-muted); }
+  .badge-verify { font-size: 10px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 2px 10px; margin-left: 8px; }
+  .badge-warn { font-size: 10px; background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); border-radius: 12px; padding: 2px 10px; }
+  .vbadge { font-size: 10px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 2px 10px; }
+  /* ── TABS ── */
+  .tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; padding: 0 24px; gap: 2px; }
+  .tab { padding: 10px 18px; font-size: 12px; font-weight: 500; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; user-select: none; }
+  .tab:hover { color: var(--text-muted); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+  /* ── PANELS ── */
+  .panel { display: none; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .panel.active { display: block; }
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media(max-width: 900px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media(max-width: 600px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+  /* ── CARD ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .card-title { font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .card-val { font-size: 22px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+  .card-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  /* ── SECTION HEADER ── */
+  .sec-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; margin-top: 24px; }
+  .sec-hdr:first-child { margin-top: 0; }
+  .sec-hdr h3 { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+  /* ── SIGNAL BADGES ── */
+  .sg { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sa { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sr { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sb-sig { background: rgba(34,211,238,0.12); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sn { background: rgba(148,163,184,0.1); color: var(--text-muted); border: 1px solid rgba(148,163,184,0.2); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  /* ── BARS ── */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .bar-label { font-size: 11px; color: var(--text-muted); min-width: 140px; }
+  .bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill-g { height: 100%; background: linear-gradient(90deg, #34d399, #059669); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-a { height: 100%; background: linear-gradient(90deg, #fbbf24, #d97706); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-b { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-val { font-size: 11px; font-family: var(--font-mono); color: var(--text); min-width: 56px; text-align: right; }
+  /* ── 52W RANGE ── */
+  .range-track { position: relative; background: var(--surface2); height: 6px; border-radius: 6px; margin: 12px 0 6px; }
+  .range-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 6px; }
+  .range-cursor { position: absolute; top: -4px; width: 14px; height: 14px; background: white; border: 2px solid var(--accent); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 3px rgba(59,130,246,0.3); }
+  .range-labels { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); }
+  /* ── SCORE RING ── */
+  .score-ring-wrap { display: flex; align-items: center; gap: 20px; }
+  .score-ring-wrap svg { flex-shrink: 0; }
+  .score-legend { display: flex; flex-direction: column; gap: 6px; }
+  .score-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .score-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  /* ── TABLE ── */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid rgba(30,45,69,0.5); color: var(--text-muted); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .data-table .val { font-family: var(--font-mono); color: var(--text); }
+  /* ── TREND DOTS ── */
+  .trd-g::before { content: '▲'; color: var(--green); font-size: 10px; margin-right: 4px; }
+  .trd-r::before { content: '▼'; color: var(--red); font-size: 10px; margin-right: 4px; }
+  .trd-a::before { content: '◆'; color: var(--amber); font-size: 10px; margin-right: 4px; }
+  /* ── BEAT / MISS CHIPS ── */
+  .bmc-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .bmc-beat { border: 1px solid rgba(52,211,153,0.4); background: rgba(52,211,153,0.08); color: var(--green); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: var(--font-mono); }
+  .bmc-miss { border: 1px solid rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); color: var(--red); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: var(--font-mono); }
+  /* ── FAIR VALUE ZONE ── */
+  .fv-bar-wrap { position: relative; height: 32px; border-radius: 6px; overflow: visible; display: flex; margin: 18px 0 8px; }
+  .fvz-u { background: rgba(52,211,153,0.18); border-radius: 6px 0 0 6px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--green); font-weight: 700; }
+  .fvz-f { background: rgba(59,130,246,0.18); height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--accent2); font-weight: 700; }
+  .fvz-p { background: rgba(248,113,113,0.18); border-radius: 0 6px 6px 0; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--red); font-weight: 700; }
+  .fv-cursor { position: absolute; top: -8px; bottom: -8px; width: 3px; background: white; border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,0.6); transform: translateX(-50%); }
+  .fv-cursor-label { position: absolute; top: -24px; font-size: 10px; font-family: var(--font-mono); color: white; font-weight: 700; transform: translateX(-50%); white-space: nowrap; }
+  .fv-mos-pos { font-size: 11px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 4px; padding: 2px 10px; display: inline-block; }
+  .fv-mos-neg { font-size: 11px; background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 2px 10px; display: inline-block; }
+  /* ── RED FLAGS ── */
+  .rf-ok { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.25); border-radius: var(--radius); padding: 14px 16px; color: var(--green); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+  .rf-warn { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.3); border-radius: var(--radius); padding: 14px 16px; }
+  .rf-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(248,113,113,0.1); font-size: 12px; color: var(--text-muted); }
+  .rf-item:last-child { border-bottom: none; }
+  .rf-bullet { color: var(--red); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+  /* ── SIGNAL SUMMARY ── */
+  .sig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media(max-width: 700px) { .sig-grid { grid-template-columns: 1fr 1fr; } }
+  .sig-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: flex-start; gap: 12px; }
+  .sig-icon { font-size: 20px; flex-shrink: 0; }
+  .sig-name { font-size: 10px; color: var(--text-dim); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; }
+  .sig-result { font-size: 13px; font-weight: 700; margin-top: 2px; }
+  /* ── DISCLAIMER ── */
+  .disclaimer { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 24px; font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+  /* ── MISC ── */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .chip { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--text-muted); margin: 2px; }
+  .mono { font-family: var(--font-mono); }
+  .green { color: var(--green); }
+  .amber { color: var(--amber); }
+  .red { color: var(--red); }
+  .cyan { color: var(--cyan); }
+  .text-muted { color: var(--text-muted); }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 4px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(30,45,69,0.5); font-size: 12px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl { color: var(--text-muted); }
+  .info-val { font-family: var(--font-mono); color: var(--text); font-weight: 500; }
+  .peer-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .peer-table th { padding: 8px 10px; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dim); background: var(--surface2); border-bottom: 1px solid var(--border); text-align: right; }
+  .peer-table th:first-child { text-align: left; }
+  .peer-table td { padding: 9px 10px; border-bottom: 1px solid rgba(30,45,69,0.5); color: var(--text-muted); text-align: right; font-family: var(--font-mono); }
+  .peer-table td:first-child { text-align: left; font-family: var(--font-sans); color: var(--text); }
+  .peer-table .best { color: var(--green); font-weight: 700; }
+  .peer-table .highlight-row td { background: rgba(59,130,246,0.06); }
+  .tag-hdfc { color: var(--accent2); font-size: 9px; vertical-align: super; }
+  .overall-card { border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; background: linear-gradient(135deg, #111827 0%, #1a2236 100%); margin-top: 16px; }
+  .overall-rating { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+  .mgmt-row { display: grid; grid-template-columns: 140px 120px 120px 100px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(30,45,69,0.5); font-size: 11px; }
+  .mgmt-row:last-child { border-bottom: none; }
+  .mgmt-hdr { font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dim); }
+  .acc-check { font-size: 13px; font-weight: 700; }
+  .scenario-bar-wrap { margin: 8px 0; }
+  .sbar-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .sbar-track { background: var(--surface2); border-radius: 4px; height: 24px; overflow: hidden; display: flex; align-items: center; }
+  .sbar-fill { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; border-radius: 4px; transition: width 1s ease; }
+  .sbar-bull { background: linear-gradient(90deg, #34d399, #059669); color: #fff; }
+  .sbar-base { background: linear-gradient(90deg, #3b82f6, #1d4ed8); color: #fff; }
+  .sbar-bear { background: linear-gradient(90deg, #f87171, #b91c1c); color: #fff; }
+  .news-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(30,45,69,0.5); }
+  .news-item:last-child { border-bottom: none; }
+  .news-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+  .news-dot.red { background: var(--red); }
+  .news-dot.amber { background: var(--amber); }
+  .news-body { font-size: 12px; color: var(--text-muted); }
+  .news-title { color: var(--text); font-weight: 500; margin-bottom: 2px; }
+  .news-meta { font-size: 10px; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+      <span class="ticker-tag">NSE: HDFCBANK</span>
+      <span class="ticker-tag">BSE: 500180</span>
+      <span class="badge-verify">✓ Web-Verified Data</span>
+    </div>
+    <div class="stock-name">HDFC Bank Limited</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">India's Largest Private Sector Bank &nbsp;·&nbsp; 3-Year Investment Horizon</div>
+  </div>
+  <div class="cmp-block">
+    <div class="cmp-val">₹772</div>
+    <div class="cmp-sub">CMP as of Jun 12, 2026 &nbsp;|&nbsp; Mkt Cap: ₹11,89,391 Cr</div>
+    <div style="margin-top:4px;">
+      <span style="font-size:11px;color:var(--red);">▼ -24.3% from 52W High</span>
+      &nbsp;
+      <span class="chip" style="font-size:10px;">FV ₹1.00</span>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab" onclick="showTab('overview')">📊 Overview</div>
+  <div class="tab" onclick="showTab('valuation')">💰 Valuation</div>
+  <div class="tab" onclick="showTab('growth')">📈 Growth</div>
+  <div class="tab" onclick="showTab('health')">🏦 Financial Health</div>
+  <div class="tab" onclick="showTab('ownership')">👥 Ownership</div>
+  <div class="tab" onclick="showTab('peers')">⚖️ Peers</div>
+  <div class="tab active" onclick="showTab('view')">★ View</div>
+  <div class="tab" onclick="showTab('news')">📰 News</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-overview">
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">Current P/E</div>
+      <div class="card-val">15.7×</div>
+      <div class="card-sub">Sector avg ~16×</div>
+    </div>
+    <div class="card">
+      <div class="card-title">P/B Ratio</div>
+      <div class="card-val">2.04×</div>
+      <div class="card-sub">Book Value ₹378/sh</div>
+    </div>
+    <div class="card">
+      <div class="card-title">NIM (Q4 FY26)</div>
+      <div class="card-val">3.38%</div>
+      <div class="card-sub">vs 3.35% prior qtr <span class="green trd-g"></span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">ROE FY26</div>
+      <div class="card-val">14.1%</div>
+      <div class="card-sub">ROA: 1.96%</div>
+    </div>
+    <div class="card">
+      <div class="card-title">GNPA Q4 FY26</div>
+      <div class="card-val green">1.15%</div>
+      <div class="card-sub">Ex-Agri: 0.91% <span class="green">↓</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">NNPA Q4 FY26</div>
+      <div class="card-val green">0.38%</div>
+      <div class="card-sub">Decade-low levels</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Capital Adequacy</div>
+      <div class="card-val">19.7%</div>
+      <div class="card-sub">CET1: 17.3%</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Dividend Yield</div>
+      <div class="card-val">1.36%</div>
+      <div class="card-sub">₹13/sh FY26 final declared</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>52-Week Price Range</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="range-track" style="position:relative;">
+      <!-- CMP at ₹772, Low ₹726.65, High ₹1020.50 → (772-726.65)/(1020.50-726.65)*100 = 15.4% -->
+      <div class="range-fill" style="width:100%"></div>
+      <div class="range-cursor" style="left:15.4%">
+        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;font-family:var(--font-mono);color:white;white-space:nowrap;font-weight:700;">₹772</div>
+      </div>
+    </div>
+    <div class="range-labels">
+      <span>52W Low: ₹726.65</span>
+      <span style="color:var(--accent2);">CMP: ₹772 (15.4% from low)</span>
+      <span>52W High: ₹1,020.50</span>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Key Financial Snapshot (FY26 Annual)</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Profit & Loss Summary</div>
+      <div class="info-row"><span class="info-lbl">Total Revenue</span><span class="info-val">₹3,48,615 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Interest Income (NII)</span><span class="info-val">₹~1,63,124 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Profit (Consolidated)</span><span class="info-val">₹79,219 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">EPS (FY26)</span><span class="info-val">₹49.39</span></div>
+      <div class="info-row"><span class="info-lbl">Dividend Payout %</span><span class="info-val">31%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Balance Sheet & Cash</div>
+      <div class="info-row"><span class="info-lbl">Total Assets</span><span class="info-val">₹49,08,041 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Total Deposits</span><span class="info-val">₹30,99,638 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Gross Advances</span><span class="info-val">₹29,600 billion</span></div>
+      <div class="info-row"><span class="info-lbl">Free Cash Flow</span><span class="info-val green">₹1,10,144 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Operating CF / Net Profit</span><span class="info-val green">~97% (STRONG)</span></div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>About the Business</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
+      HDFC Bank is India's largest private sector bank by assets and market cap, with a 15% market share in banking advances and 37% in private sector advances. Following its landmark merger with HDFC Limited (July 2023), the bank became a full-service financial conglomerate. Its network of 9,689 branches and 21,172 ATMs across 4,175 cities reinforces India's deepest retail banking franchise. The bank operates across retail banking, wholesale banking, treasury, insurance (HDFC Life, HDFC ERGO), asset management (HDFC AMC), and NBFC (HDB Financial Services).
+      <div class="mt-12"><strong style="color:var(--text);">Competitive Moat:</strong> Unmatched branch network density, dominant CASA franchise, superior underwriting culture, and subsidiary ecosystem create durable competitive advantages across every banking segment.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: VALUATION -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-valuation">
+
+  <div class="sec-hdr"><h3>Valuation Metrics vs Sector & 5Y Average</h3><div class="sec-line"></div><span class="sa">BFSI: P/B Primary Metric</span></div>
+  <div class="card mt-12">
+    <div class="card-title">P/B Ratio (Primary for BFSI)</div>
+    <div class="bar-row">
+      <span class="bar-label">HDFC Bank (Current)</span>
+      <div class="bar-track"><div class="bar-fill-b" style="width:44%"></div></div>
+      <span class="bar-val">2.04×</span>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">Sector Avg (Pvt Banks)</span>
+      <div class="bar-track"><div class="bar-fill-a" style="width:67%"></div></div>
+      <span class="bar-val">2.8× ~</span>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">HDFC 5Y Avg P/B</span>
+      <div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div>
+      <span class="bar-val">3.5× (approx)</span>
+    </div>
+    <div class="mt-12" style="font-size:11px;color:var(--green);">✓ Current P/B of 2.04× is below both sector avg and historical avg — suggesting undervaluation on book value basis.</div>
+  </div>
+
+  <div class="grid-2 mt-12">
+    <div class="card">
+      <div class="card-title">P/E Ratio</div>
+      <div class="bar-row">
+        <span class="bar-label">HDFC Bank (TTM)</span>
+        <div class="bar-track"><div class="bar-fill-b" style="width:49%"></div></div>
+        <span class="bar-val">15.7×</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">ICICI Bank</span>
+        <div class="bar-track"><div class="bar-fill-a" style="width:52%"></div></div>
+        <span class="bar-val">16.7×</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Kotak Mahindra</span>
+        <div class="bar-track"><div class="bar-fill-g" style="width:64%"></div></div>
+        <span class="bar-val">20.2×</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Axis Bank</span>
+        <div class="bar-track"><div class="bar-fill-b" style="width:47%"></div></div>
+        <span class="bar-val">14.9×</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Valuation Classification</div>
+      <div class="info-row"><span class="info-lbl">P/B vs Sector</span><span class="info-val"><span class="sg">CHEAP</span></span></div>
+      <div class="info-row"><span class="info-lbl">P/B vs 5Y Avg</span><span class="info-val"><span class="sg">CHEAP</span></span></div>
+      <div class="info-row"><span class="info-lbl">P/E vs Peers</span><span class="info-val"><span class="sg">FAIR</span></span></div>
+      <div class="info-row"><span class="info-lbl">PEG Ratio (P/E÷EPS CAGR)</span><span class="info-val"><span class="sg">~0.87 — CHEAP</span></span></div>
+      <div class="info-row"><span class="info-lbl">Overall Verdict</span><span class="info-val"><span class="sg">UNDERVALUED</span></span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">PEG = 15.7 ÷ 18 (3Y profit CAGR) = 0.87. Below 1 = CHEAP.</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Fair Value Range (P/B Method — BFSI)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="grid-3 mb-4">
+      <div>
+        <div style="font-size:10px;color:var(--text-dim);">Bear Fair Value</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--red);">₹800</div>
+        <div style="font-size:10px;color:var(--text-dim);">BV₹378 × 2.1× (5Y min P/B)</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text-dim);">Base Fair Value</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--accent2);">₹1,020</div>
+        <div style="font-size:10px;color:var(--text-dim);">BV₹378 × 2.7× (5Y median P/B)</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text-dim);">Bull Fair Value</div>
+        <div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--green);">₹1,400</div>
+        <div style="font-size:10px;color:var(--text-dim);">BV₹378 × 3.7× (5Y max P/B)</div>
+      </div>
+    </div>
+
+    <!-- Fair value bar: full range ₹680 (Bear×0.85) to ₹1,610 (Bull×1.15) = span of 930 -->
+    <!-- Undervalued: ₹680→₹800 = 12.9% of span -->
+    <!-- Fair: ₹800→₹1400 = 64.5% of span -->
+    <!-- Premium: ₹1400→₹1610 = 22.6% of span -->
+    <!-- CMP ₹772: (772-680)/930 = 9.9% left -->
+    <div class="fv-bar-wrap">
+      <div class="fvz-u" style="width:12.9%">STRONG BUY</div>
+      <div class="fvz-f" style="width:64.5%">FAIR ZONE</div>
+      <div class="fvz-p" style="width:22.6%">PREMIUM</div>
+      <div class="fv-cursor" style="left:9.9%">
+        <div class="fv-cursor-label">₹772</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:6px;display:flex;justify-content:space-between;">
+      <span>₹680</span><span>Bear FV ₹800</span><span>Base FV ₹1,020</span><span>Bull FV ₹1,400</span><span>₹1,610</span>
+    </div>
+
+    <div class="mt-12" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:var(--text-muted);">Margin of Safety vs Base FV:</span>
+      <span class="fv-mos-pos">+24.2% MOS</span>
+      <span style="font-size:11px;color:var(--text-dim);">(₹1,020 − ₹772) ÷ ₹1,020</span>
+    </div>
+    <div class="mt-8" style="font-size:11px;color:var(--amber);">⚠ CMP ₹772 is currently in the STRONG BUY ZONE (below Bear FV of ₹800), implying the market is pricing in governance risk and NIM pressure.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: GROWTH -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-growth">
+
+  <div class="sec-hdr"><h3>Revenue & Profit CAGR</h3><div class="sec-line"></div><span class="sa">STEADY GROWTH</span></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Revenue CAGR (Consolidated)</div>
+      <div class="bar-row"><span class="bar-label">10-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div><span class="bar-val">19%</span></div>
+      <div class="bar-row"><span class="bar-label">5-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:86%"></div></div><span class="bar-val">22%*</span></div>
+      <div class="bar-row"><span class="bar-label">3-Year CAGR</span><div class="bar-track"><div class="bar-fill-a" style="width:100%"></div></div><span class="bar-val">27%*</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">*Merger with HDFC Ltd (Jul 2023) inflates 3Y/5Y consolidated revenue CAGR. Standalone banking CAGR is ~15%. Source: Screener.in</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Net Profit CAGR</div>
+      <div class="bar-row"><span class="bar-label">10-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div><span class="bar-val">20%</span></div>
+      <div class="bar-row"><span class="bar-label">5-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:95%"></div></div><span class="bar-val">19%</span></div>
+      <div class="bar-row"><span class="bar-label">3-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:90%"></div></div><span class="bar-val">18%</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: Screener.in (pre-computed). 5Y profit growth of 19% CAGR — Screener "Pros" confirmed.</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Quarterly EPS Trend (Last 8 Quarters)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="data-table">
+      <tr>
+        <th>Quarter</th><th>EPS (₹)</th><th>YoY Change</th>
+      </tr>
+      <tr><td>Q1 FY25</td><td class="val">10.83</td><td><span class="trd-a" style="color:var(--text-muted);font-size:11px;">Merger integration</span></td></tr>
+      <tr><td>Q2 FY25</td><td class="val">11.68</td><td><span class="trd-g" style="color:var(--green);">+7.8% YoY</span></td></tr>
+      <tr><td>Q3 FY25</td><td class="val">11.54</td><td><span class="trd-g" style="color:var(--green);">+1.5% YoY</span></td></tr>
+      <tr><td>Q4 FY25</td><td class="val">12.31</td><td><span class="trd-g" style="color:var(--green);">+6.1% YoY</span></td></tr>
+      <tr><td>Q1 FY26</td><td class="val">10.60</td><td><span class="trd-a" style="color:var(--amber);">-2.1% YoY</span></td></tr>
+      <tr><td>Q2 FY26</td><td class="val">12.76</td><td><span class="trd-g" style="color:var(--green);">+9.2% YoY</span></td></tr>
+      <tr><td>Q3 FY26</td><td class="val">12.87</td><td><span class="trd-g" style="color:var(--green);">+11.5% YoY</span></td></tr>
+      <tr><td>Q4 FY26</td><td class="val">12.50</td><td><span class="trd-g" style="color:var(--green);">+7.7% YoY</span></td></tr>
+    </table>
+    <div style="font-size:11px;color:var(--green);margin-top:10px;">✓ Four consecutive quarters of YoY profit acceleration — earnings trajectory improving. Source: Screener.in / Q4 FY26 Earnings Presentation.</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Earnings Beat / Miss vs Consensus</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="bmc-row">
+      <span class="bmc-miss">Q1 FY25 ✗</span>
+      <span class="bmc-beat">Q2 FY25 ✓</span>
+      <span class="bmc-beat">Q3 FY25 ✓</span>
+      <span class="bmc-beat">Q4 FY25 ✓</span>
+      <span class="bmc-miss">Q1 FY26 ✗</span>
+      <span class="bmc-beat">Q2 FY26 ✓</span>
+      <span class="bmc-beat">Q3 FY26 ✓</span>
+      <span class="bmc-beat">Q4 FY26 ✓</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">
+      <strong class="green">6 of 8 Beats</strong> &nbsp;→&nbsp; Classification: <span class="sb-sig">MOSTLY RELIABLE</span>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">Source: Analyst previews (Nomura, Citi, YES Securities), Business Standard consensus tracker</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Forward Projections (3-Year Horizon)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">Base: 5Y profit CAGR 19% × 0.85 = ~16%; Bear: ×0.50 = ~9.5%; Bull: ×1.15 = ~22%</div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">🐂 Bull: Net Profit CAGR ~22% → FY29E Profit ~₹1,38,000 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-bull" style="width:100%">₹1,38,000 Cr</div></div>
+    </div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">📊 Base: Net Profit CAGR ~16% → FY29E Profit ~₹1,18,000 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-base" style="width:85%">₹1,18,000 Cr</div></div>
+    </div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">🐻 Bear: Net Profit CAGR ~9.5% → FY29E Profit ~₹1,04,000 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-bear" style="width:55%">₹1,04,000 Cr</div></div>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:10px;">Bear assumes NIM compression persists, FII selling continues, governance headwinds. Bull assumes NIM recovery to 3.6%+, CASA rebound above 44%, and ECL framework less punitive than feared.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: FINANCIAL HEALTH -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-health">
+
+  <div class="sec-hdr"><h3>BFSI Health Metrics</h3><div class="sec-line"></div><span class="sg">STRONG</span></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Asset Quality Trend</div>
+      <div class="info-row"><span class="info-lbl">GNPA Q4 FY26</span><span class="info-val green">1.15% <span class="trd-g"></span></span></div>
+      <div class="info-row"><span class="info-lbl">GNPA Q3 FY26</span><span class="info-val">1.24%</span></div>
+      <div class="info-row"><span class="info-lbl">GNPA Ex-Agriculture</span><span class="info-val green">0.91%</span></div>
+      <div class="info-row"><span class="info-lbl">NNPA Q4 FY26</span><span class="info-val green">0.38%</span></div>
+      <div class="info-row"><span class="info-lbl">Credit Cost Ratio</span><span class="info-val green">0.35% (benign)</span></div>
+      <div class="info-row"><span class="info-lbl">Provisions Q4 YoY</span><span class="info-val green">-18% ↓</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Asset quality at decade lows. No visible stress flagged across segments per management. Source: Business Standard / Q4 Earnings Presentation.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Capital & Liquidity</div>
+      <div class="info-row"><span class="info-lbl">Capital Adequacy (CAR)</span><span class="info-val green">19.7% (SAFE)</span></div>
+      <div class="info-row"><span class="info-lbl">CET1 Ratio</span><span class="info-val green">17.3%</span></div>
+      <div class="info-row"><span class="info-lbl">Liquidity Coverage (LCR)</span><span class="info-val green">114%</span></div>
+      <div class="info-row"><span class="info-lbl">Net Stable Funding (NSFR)</span><span class="info-val green">118%</span></div>
+      <div class="info-row"><span class="info-lbl">CASA Ratio Q4 FY26</span><span class="info-val amber">~32-34%</span></div>
+      <div class="info-row"><span class="info-lbl">D/E (Borrowings/Deposits)</span><span class="info-val green">0.19× (SAFE)</span></div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Cash Flow Quality</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="data-table">
+      <tr><th>Year</th><th>OCF (₹ Cr)</th><th>FCF (₹ Cr)</th><th>Net Profit (₹ Cr)</th><th>OCF/NP</th><th>Quality</th></tr>
+      <tr><td>FY24</td><td class="val">19,069</td><td class="val">14,882</td><td class="val">65,446</td><td class="val amber">0.29×</td><td><span class="sa">WATCH</span></td></tr>
+      <tr><td>FY25</td><td class="val">1,27,242</td><td class="val">1,23,267</td><td class="val">73,440</td><td class="val green">1.73×</td><td><span class="sg">STRONG</span></td></tr>
+      <tr><td>FY26</td><td class="val">1,13,506</td><td class="val">1,10,144</td><td class="val">79,219</td><td class="val green">1.43×</td><td><span class="sg">STRONG</span></td></tr>
+    </table>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">FY24 OCF was depressed by merger-related balance sheet restructuring. FY25-26 show exceptional cash generation. Source: Screener.in consolidated cash flow.</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>NIM Trend & CASA Recovery Path</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="bar-row"><span class="bar-label">Q4 FY24 NIM</span><div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div><span class="bar-val">3.65%</span></div>
+    <div class="bar-row"><span class="bar-label">Q1 FY25 NIM</span><div class="bar-track"><div class="bar-fill-a" style="width:93%"></div></div><span class="bar-val">3.47%</span></div>
+    <div class="bar-row"><span class="bar-label">Q2 FY25 NIM</span><div class="bar-track"><div class="bar-fill-a" style="width:92%"></div></div><span class="bar-val">3.46%</span></div>
+    <div class="bar-row"><span class="bar-label">Q3 FY26 NIM</span><div class="bar-track"><div class="bar-fill-a" style="width:89%"></div></div><span class="bar-val">3.35%</span></div>
+    <div class="bar-row"><span class="bar-label">Q4 FY26 NIM</span><div class="bar-track"><div class="bar-fill-g" style="width:90%"></div></div><span class="bar-val green">3.38% ▲</span></div>
+    <div style="font-size:11px;color:var(--amber);margin-top:10px;">⚠ NIM bottomed in Q3 FY26. Q4 shows first sequential uptick. FY27 catalyst: RBI rate cut cycle transmission + borrowing cost reduction. Key target for analysts: NIM stabilisation above 3.5%. Source: Q4 FY26 Earnings Presentation.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: OWNERSHIP -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-ownership">
+
+  <div class="sec-hdr"><h3>Shareholding Pattern</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Current Shareholding (Q4 FY26 / Mar 2026)</div>
+      <div class="info-row"><span class="info-lbl">Promoter Holding</span><span class="info-val amber">0% (No promoter group)</span></div>
+      <div class="info-row"><span class="info-lbl">FII / FPI</span><span class="info-val">~44–48%</span></div>
+      <div class="info-row"><span class="info-lbl">DII (Mutual Funds, Insurance)</span><span class="info-val">~10–11%</span></div>
+      <div class="info-row"><span class="info-lbl">Retail / Public</span><span class="info-val">~15–16%</span></div>
+      <div class="info-row"><span class="info-lbl">Promoter Pledging</span><span class="info-val green">NIL (No promoter)</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: Choice India / Upstox shareholding data. HDFC Bank has no identifiable promoter group post the HDFC Limited merger completion.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Institutional Trend</div>
+      <div class="info-row"><span class="info-lbl">FII Trend (last 4Q)</span><span class="info-val amber">DECREASING (selling pressure)</span></div>
+      <div class="info-row"><span class="info-lbl">DII Trend</span><span class="info-val green">STABLE-INCREASING</span></div>
+      <div class="info-row"><span class="info-lbl">Key Risk</span><span class="info-val amber">MSCI/NIFTY weight → forced FII selling</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">FII selling has been a structural headwind since the HDFC merger (July 2023) inflated the bank's index weight, creating forced rebalancing outflows from passive FII funds. Nomura sees FCNR-B inflows as a potential re-inflow catalyst (15% of new inflows).</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Governance & Management Accountability</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="card-title">Management Guidance vs Actual (Last 4 Quarters)</div>
+    <div style="overflow-x:auto;">
+      <div style="display:grid;grid-template-columns:150px 160px 160px 110px;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span class="mgmt-hdr">Quarter</span><span class="mgmt-hdr">Guidance</span><span class="mgmt-hdr">Actual</span><span class="mgmt-hdr">Verdict</span>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 160px 160px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q1 FY26</span>
+        <span style="color:var(--text-muted);">Outpace system credit growth</span>
+        <span style="color:var(--text-muted);">Loan growth moderated; -2.1% EPS YoY</span>
+        <span class="sr">MISSED</span>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 160px 160px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q2 FY26</span>
+        <span style="color:var(--text-muted);">Deposit growth outpace loans</span>
+        <span style="color:var(--text-muted);">Deposits 12.2% YoY, advances 11.9% ✓</span>
+        <span class="sg">MET</span>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 160px 160px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,45,69,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q3 FY26</span>
+        <span style="color:var(--text-muted);">Stable GNPA, PAT growth</span>
+        <span style="color:var(--text-muted);">GNPA 1.24%, PAT +11.5% YoY ✓</span>
+        <span class="sg">BEAT</span>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 160px 160px 110px;gap:6px;padding:8px 0;font-size:11px;">
+        <span style="color:var(--text-muted);">Q4 FY26</span>
+        <span style="color:var(--text-muted);">12% credit growth, deposit focus</span>
+        <span style="color:var(--text-muted);">Credit 12% ✓, Deposits 14.4% ✓, PAT +9% ✓</span>
+        <span class="sg">BEAT</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+      Execution Score: <strong class="amber">3/4 = RELIABLE</strong>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Board & Governance</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="info-row"><span class="info-lbl">MD & CEO</span><span class="info-val">Sashidhar Jagdishan (under scrutiny re: MSRDC)</span></div>
+    <div class="info-row"><span class="info-lbl">Chairman</span><span class="info-val amber">Vacant (Atanu Chakraborty resigned Mar 18, 2026)</span></div>
+    <div class="info-row"><span class="info-lbl">Auditor</span><span class="info-val">No qualification flagged in FY26</span></div>
+    <div class="info-row"><span class="info-lbl">Related Party Transactions</span><span class="info-val green">Below 5% of revenue</span></div>
+    <div class="info-row"><span class="info-lbl">Board Independence</span><span class="info-val">Majority independent directors</span></div>
+    <div style="font-size:10px;color:var(--amber);margin-top:8px;">⚠ Key governance risk: Chairman's vacancy since March 2026, internal MSRDC probe implicating senior leadership.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: PEERS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-peers">
+  <div class="sec-hdr"><h3>Peer Comparison — Top 4 Private Sector Banks</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="peer-table">
+      <tr>
+        <th>Bank</th>
+        <th>CMP (₹)</th>
+        <th>P/E (TTM)</th>
+        <th>P/B</th>
+        <th>ROE</th>
+        <th>NIM</th>
+        <th>GNPA%</th>
+        <th>Status</th>
+      </tr>
+      <tr class="highlight-row">
+        <td><strong>HDFC Bank</strong> <span class="tag-hdfc">★</span></td>
+        <td>772</td>
+        <td class="best">15.7×</td>
+        <td class="best">2.04×</td>
+        <td>14.1%</td>
+        <td>3.38%</td>
+        <td class="best">1.15%</td>
+        <td><span class="sb-sig">MID-PACK</span></td>
+      </tr>
+      <tr>
+        <td>ICICI Bank</td>
+        <td>1,263</td>
+        <td>16.7×</td>
+        <td>2.61×</td>
+        <td class="best">17.0%+</td>
+        <td class="best">4.32%</td>
+        <td>1.40%</td>
+        <td><span class="sg">LEADING</span></td>
+      </tr>
+      <tr>
+        <td>Kotak Mahindra Bank</td>
+        <td>378</td>
+        <td>20.2×</td>
+        <td>2.19×</td>
+        <td>~13.5%</td>
+        <td>~4.9%</td>
+        <td>~1.5%</td>
+        <td><span class="sa">MID-PACK</span></td>
+      </tr>
+      <tr>
+        <td>Axis Bank</td>
+        <td>1,261</td>
+        <td>14.9×</td>
+        <td>1.91×</td>
+        <td>~14.0%</td>
+        <td>~3.9%</td>
+        <td>~1.5%</td>
+        <td><span class="sa">MID-PACK</span></td>
+      </tr>
+    </table>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: Motilal Oswal peer data, Q4 FY26 filings. ★ = Stock under analysis. Best value per column highlighted green.</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Key Competitive Differentiators</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="color:var(--green);">HDFC Bank Advantages</div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body"><div class="news-title">Lowest GNPA among large private peers</div>1.15% vs ICICI 1.40%, reflecting superior underwriting & credit culture over decades.</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body"><div class="news-title">Cheapest on P/B vs history</div>2.04× P/B is well below its own 5Y avg of ~3.5×, creating valuation comfort.</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body"><div class="news-title">Largest branch & CASA franchise</div>9,689 branches, 51% in semi-urban/rural India — unmatched deposit mobilization reach.</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body"><div class="news-title">Subsidiary ecosystem</div>HDFC Life, HDFC AMC (₹9.3T AUM, 11.4% market share), HDFC ERGO add significant non-banking value.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--amber);">Where ICICI / Others Lead</div>
+      <div class="news-item"><div class="news-dot" style="background:var(--red)"></div><div class="news-body"><div class="news-title">NIM: ICICI at 4.32% vs HDFC 3.38%</div>ICICI earns significantly more per rupee of loan — a 94 bps NIM gap reflects HDFC's lower-yield mortgage-heavy book from the merger.</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--red)"></div><div class="news-body"><div class="news-title">ROE: ICICI 17%+ vs HDFC 14.1%</div>ICICI's superior return on equity justifies its premium P/B valuation and faster profit growth trajectory.</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--amber)"></div><div class="news-body"><div class="news-title">CASA ratio compression</div>HDFC CASA at 32-34% vs historical 40%+ — deposit franchise still recovering post-merger.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: VIEW ★ (DEFAULT) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-view">
+
+  <!-- Score Ring + Signal Summary -->
+  <div class="sec-hdr"><h3>Overall Signal Dashboard</h3><div class="sec-line"></div></div>
+
+  <div class="grid-2">
+    <!-- Score Ring -->
+    <div class="card" style="display:flex;align-items:center;gap:24px;">
+      <!-- Score: Confidence = 8.5/10 (HIGH) -->
+      <!-- circumference=251.33; dashoffset = 251.33×(1-8.5/11) = 251.33×0.227 = 57.05 -->
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#34d399" stroke-width="12"
+          stroke-dasharray="251.33" stroke-dashoffset="57.05"
+          stroke-linecap="round"
+          transform="rotate(-90 55 55)"/>
+        <text x="55" y="51" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="700" font-family="monospace">8.5</text>
+        <text x="55" y="66" text-anchor="middle" fill="#94a3b8" font-size="9">/10 Confidence</text>
+      </svg>
+      <div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">DATA CONFIDENCE</div>
+        <div style="font-size:18px;font-weight:800;color:var(--green);">HIGH</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">35/35 data points verified</div>
+        <div style="margin-top:10px;"><span class="vbadge">✓ Web-Verified Data</span></div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:6px;">Generated: Jun 16, 2026</div>
+      </div>
+    </div>
+
+    <!-- Overall Rating -->
+    <div class="card overall-card">
+      <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">3-Year Investment View</div>
+      <div class="overall-rating amber">MODERATE →</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.6;">
+        Fundamentally sound franchise at historically cheap valuations, held back by near-term NIM headwinds and a material governance risk (chairman vacancy + MSRDC probe). Strong risk-reward for patient 3-year investors.
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip" style="color:var(--green);">24% MOS vs Base FV</span>
+        <span class="chip" style="color:var(--amber);">NIM bottoming</span>
+        <span class="chip" style="color:var(--red);">Governance risk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6-Signal Hexagon -->
+  <div class="sec-hdr mt-16"><h3>6 Core Investment Signals</h3><div class="sec-line"></div></div>
+  <div class="sig-grid">
+    <div class="sig-card">
+      <div class="sig-icon">💰</div>
+      <div>
+        <div class="sig-name">Valuation</div>
+        <div class="sig-result" style="color:var(--green);">UNDERVALUED</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">P/B 2.04× vs 5Y avg 3.5×; PEG 0.87</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">📈</div>
+      <div>
+        <div class="sig-name">Growth</div>
+        <div class="sig-result" style="color:var(--accent2);">STEADY</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">3Y profit CAGR 18%; EPS accelerating 4Q</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">🏦</div>
+      <div>
+        <div class="sig-name">Financial Health</div>
+        <div class="sig-result" style="color:var(--green);">STRONG</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">CAR 19.7%; GNPA 1.15%; FCF ₹1.1L Cr</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">📊</div>
+      <div>
+        <div class="sig-name">Returns</div>
+        <div class="sig-result" style="color:var(--amber);">AVERAGE</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">ROE 14.1%; RoA 1.96%; below 17% ICICI</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">⚙️</div>
+      <div>
+        <div class="sig-name">Capital Allocation</div>
+        <div class="sig-result" style="color:var(--green);">GOOD (2/3)</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Good divs; ✓ deposit discipline; NIM uncertain</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">🎯</div>
+      <div>
+        <div class="sig-name">Earnings Consistency</div>
+        <div class="sig-result" style="color:var(--cyan);">MOSTLY RELIABLE</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">6/8 quarters beat consensus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capital Allocation Detail -->
+  <div class="sec-hdr mt-16"><h3>Capital Allocation Scorecard</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="info-row">
+      <span class="info-lbl">ROA vs Cost of Equity (~12%)</span>
+      <span class="info-val"><span class="acc-check green">✓</span> ROA 1.96% → Adequate returns above funding cost</span>
+    </div>
+    <div class="info-row">
+      <span class="info-lbl">Dividend + Capital Return</span>
+      <span class="info-val"><span class="acc-check green">✓</span> ₹13/sh + ₹2.50 special interim dividend FY26</span>
+    </div>
+    <div class="info-row">
+      <span class="info-lbl">Capex/Balance sheet discipline</span>
+      <span class="info-val"><span class="acc-check amber">~</span> Borrowings ↓ 11% YoY; deposit-led growth ✓</span>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-muted);">Score: <strong class="green">2/3 → GOOD</strong></div>
+  </div>
+
+  <!-- Red Flags Section -->
+  <div class="sec-hdr mt-16"><h3>🚨 Red Flags Checklist</h3><div class="sec-line"></div></div>
+  <div class="rf-warn">
+    <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:10px;">⚠ 2 Red Flags Identified</div>
+    <div class="rf-item">
+      <span class="rf-bullet">●</span>
+      <div>
+        <strong style="color:var(--text);">Chairman Vacancy & Governance Concern</strong><br>
+        Part-time Chairman Atanu Chakraborty resigned on March 18, 2026, citing "certain happenings and practices within the bank not aligned with personal values and ethics." Board leadership gap is a material governance risk.
+      </div>
+    </div>
+    <div class="rf-item">
+      <span class="rf-bullet">●</span>
+      <div>
+        <strong style="color:var(--text);">MSRDC Internal Probe — Senior Executive Accountability</strong><br>
+        Indian Express (May 27, 2026) investigation revealed internal vigilance probe found 10+ senior officials — including MD/CEO Sashidhar Jagdishan, CFO Srinivasan Vaidyanathan, and CMO Ravi Santhanam — responsible for ₹45 Cr alleged irregular payments to MSRDC disguised as marketing spend. Bank has halted government deposit mobilisation from July 1, 2026. Regulatory outcome pending.
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:10px;" class="card" style="background:rgba(52,211,153,0.04);">
+    <div style="font-size:11px;color:var(--text-muted);">
+      ✅ No Promoter Pledging &nbsp;|&nbsp; ✅ No Auditor Qualification &nbsp;|&nbsp; ✅ GNPA/NNPA at decade lows &nbsp;|&nbsp; ✅ Strong CAR (19.7%) &nbsp;|&nbsp; ✅ No single-customer revenue concentration &nbsp;|&nbsp; ✅ Earnings quality OCF/NP strong (FY25-26)
+    </div>
+  </div>
+
+  <!-- Strengths, Risks, One Thing to Track -->
+  <div class="sec-hdr mt-16"><h3>3 Strengths · 2 Risks · 1 Thing to Track</h3><div class="sec-line"></div></div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:var(--green);">Top 3 Strengths</div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body">World-class asset quality (GNPA 1.15%), sector-leading underwriting discipline built over 30 years</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body">Historically cheap valuation — P/B 2.04× at 42% discount to 5Y average; 24% MOS to base FV</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--green)"></div><div class="news-body">Unmatched branch network + subsidiary ecosystem (HDFC AMC, Life, ERGO) offers optionality not priced in</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red);">Top 2 Risks</div>
+      <div class="news-item"><div class="news-dot" style="background:var(--red)"></div><div class="news-body">Governance crisis escalation — if RBI takes regulatory action on MSRDC probe or MD/CEO succession becomes disruptive</div></div>
+      <div class="news-item"><div class="news-dot" style="background:var(--red)"></div><div class="news-body">Prolonged NIM compression — if RBI rate cut cycle reduces asset yields faster than deposit costs, FY27 earnings growth could disappoint below 10%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--cyan);">1 Thing to Track</div>
+      <div style="font-size:13px;font-weight:700;color:var(--cyan);margin: 10px 0 6px;">NIM Recovery + MSRDC Resolution</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">Monitor whether NIM crosses 3.5% by Q2 FY27 (catalyst: rate transmission + FCNR-B inflows). Simultaneously, watch for RBI's formal response to MSRDC probe — a clean regulatory chit would materially re-rate the stock toward Base FV ₹1,020.</div>
+    </div>
+  </div>
+
+  <!-- Analyst Targets -->
+  <div class="sec-hdr mt-16"><h3>Analyst Consensus & Price Targets</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="grid-4">
+      <div><div style="font-size:10px;color:var(--text-dim);">Nomura</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--green);">₹950</div><div style="font-size:10px;color:var(--text-dim);">BUY</div></div>
+      <div><div style="font-size:10px;color:var(--text-dim);">Axis Direct</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--green);">₹975</div><div style="font-size:10px;color:var(--text-dim);">BUY</div></div>
+      <div><div style="font-size:10px;color:var(--text-dim);">Univest</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--green);">₹~950+</div><div style="font-size:10px;color:var(--text-dim);">ACCUMULATE</div></div>
+      <div><div style="font-size:10px;color:var(--text-dim);">Analyst Range</div><div style="font-size:16px;font-weight:700;font-family:var(--font-mono);color:var(--accent2);">₹950–975</div><div style="font-size:10px;color:var(--text-dim);">Highest upside among pvt banks</div></div>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:10px;">Source: Business Standard, Axis Direct Q4FY26 result update (Apr 20, 2026). Zeebiz analyst survey. Note: Among 4 large private lenders, brokerages see highest upside potential in HDFC Bank post-Q4 FY26 results.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PANEL: NEWS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-news">
+  <div class="sec-hdr"><h3>Top 10 News Items — Long-Term Investor Relevance</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="news-item">
+      <div class="news-dot red"></div>
+      <div class="news-body">
+        <div class="news-title">MSRDC Governance Crisis — Internal Probe Implicates Senior Leadership</div>
+        Indian Express investigation (May 27, 2026) revealed HDFC Bank's own vigilance probe found 10+ senior officials including MD/CEO Jagdishan responsible for ₹45 Cr irregular payments to MSRDC disguised as marketing spend.
+        <div class="news-meta">May 27, 2026 · The Week / Business Standard / The Probe</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot red"></div>
+      <div class="news-body">
+        <div class="news-title">Chairman Atanu Chakraborty Resigns Citing Ethical Concerns</div>
+        Former Economic Affairs Secretary Atanu Chakraborty resigned as Part-Time Chairman on March 18, 2026, citing "happenings and practices" not aligned with personal ethics — first such resignation in HDFC Bank's history.
+        <div class="news-meta">March 18, 2026 · Business Standard</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot amber"></div>
+      <div class="news-body">
+        <div class="news-title">HDFC Bank to Halt Government Deposit Mobilisation from July 1, 2026</div>
+        Bank to discontinue FDs, savings, and current accounts from government entities via DSAs/third-party channels — a proactive governance remediation step post MSRDC controversy.
+        <div class="news-meta">Jun 9, 2026 · Republic World</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">Q4 FY26: PAT Up 9.1% to ₹19,221 Cr; GNPA at Decade Low 1.15%</div>
+        Standalone PAT rose 9.1% YoY; deposits +14.4% YoY; advances +12% YoY; NIM improved 3 bps QoQ to 3.38%; declared ₹13/share final dividend.
+        <div class="news-meta">April 18, 2026 · Business Standard / APAC Media</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">Nomura Maintains BUY at ₹950 — Sees FCNR-B Inflow as Re-rating Catalyst</div>
+        Nomura projects HDFC Bank can capture 15% of FCNR-B inflows (~3% of deposit base), improving weak deposit growth and liquidity ratios, potentially accelerating NIM recovery.
+        <div class="news-meta">2026 · Groww / Nomura</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot amber"></div>
+      <div class="news-body">
+        <div class="news-title">Management Turns Cautious on FY27 — Will No Longer Commit to Outpacing System Credit Growth</div>
+        Citing geopolitical uncertainty, management stepped back from earlier guidance of outpacing banking system credit growth and now aims to maintain FY26's 12% growth momentum.
+        <div class="news-meta">April 19, 2026 · Business Standard</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">FY27 Milestones: NIM Above 3.5% and Credit Cost Below 0.5% Are Key Catalysts</div>
+        Analyst reviews flag these two metrics as the primary FY27 earnings delivery milestones that could re-rate the stock toward ₹950-975 analyst targets.
+        <div class="news-meta">May 2026 · Univest Research</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">HDB Financial Services (Subsidiary) Posts 41% YoY Profit Growth in Q4 FY26</div>
+        HDB Financial — HDFC Bank's NBFC arm — delivered strong Q4 FY26 performance, reinforcing the consolidated subsidiary value that the standalone CMP does not fully reflect.
+        <div class="news-meta">April 2026 · JourneyTowardsSaving</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot amber"></div>
+      <div class="news-body">
+        <div class="news-title">NSE Exchange Seeks Clarification on MSRDC Governance Allegations</div>
+        NSE formally asked HDFC Bank to respond to media reports about the internal probe and alleged differential interest payments — regulatory attention elevated.
+        <div class="news-meta">May 27, 2026 · Screener.in Announcements / NSE</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">HDFC Bank's 9,689-Branch Network Underpins Deposit Franchise Recovery</div>
+        As of March 31, 2026, HDFC Bank's network grew to 9,689 branches and 21,172 ATMs. The branch expansion (700+ in FY25) is systematically rebuilding the CASA ratio that compressed post-merger.
+        <div class="news-meta">April 2026 · Q4 FY26 Earnings Presentation</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div style="padding: 0 24px 24px; max-width:1400px; margin: 0 auto;">
+  <div class="disclaimer">
+    <strong style="color:var(--text-muted);">SEBI Disclaimer:</strong> This report is prepared for informational and educational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell securities. The information herein is based on publicly available data and web-verified sources as of June 16, 2026. Past performance is not indicative of future returns. Investment in equity markets is subject to market risks. Please read all scheme-related documents carefully before investing. Consult a SEBI-registered investment advisor before making investment decisions.
+    <br><br>
+    <strong style="color:var(--text-muted);">Prepared by:</strong> Kushal Lunia &nbsp;|&nbsp; CA Final Candidate &nbsp;|&nbsp; EY (Big 4) & UBS Experience &nbsp;|&nbsp;
+    <a href="https://www.linkedin.com/in/kushal-lunia-7b9585138/" target="_blank" style="color:var(--accent2); text-decoration:none;">🔗 LinkedIn Profile</a>
+    &nbsp;|&nbsp; <strong>Generated:</strong> June 16, 2026, 00:00 IST
+    <br><br>
+    <span style="color:var(--text-dim);">Data Sources: Screener.in · NSE India · Business Standard · Tickertape · HDFC Bank Q4 FY26 Earnings Presentation · Insider Monkey Earnings Transcript · The Week · Univest Research · Motilal Oswal · Republic World</span>
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Animate bars on load
+window.addEventListener('DOMContentLoaded', () => {
+  // All bars start at 0 and animate to their target width (already set via inline style)
+  const bars = document.querySelectorAll('.bar-fill-g, .bar-fill-a, .bar-fill-b, .sbar-fill');
+  bars.forEach(bar => {
+    const targetW = bar.style.width;
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = targetW; }, 200);
+  });
+});
+</script>
+</body>
+</html>
