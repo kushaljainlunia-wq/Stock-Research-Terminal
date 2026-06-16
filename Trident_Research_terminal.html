@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trident Ltd | Fundamental Terminal</title>
+<style>
+  :root {
+    --bg: #0a0f0a;
+    --surface: #0f1a10;
+    --surface2: #162018;
+    --surface3: #1c2a1e;
+    --border: #1e3320;
+    --border2: #254428;
+    --text: #e6ede6;
+    --text-muted: #93a893;
+    --text-dim: #607060;
+    --accent: #4ade80;
+    --accent2: #86efac;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --cyan: #22d3ee;
+    --purple: #c084fc;
+    --teal: #2dd4bf;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.5; min-height: 100vh; }
+  /* TOPBAR */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .ticker-tag { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+  .stock-name { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .cmp-block { margin-left: auto; text-align: right; }
+  .cmp-val { font-size: 26px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+  .cmp-sub { font-size: 11px; color: var(--text-muted); }
+  .badge-verify { font-size: 10px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 2px 10px; margin-left: 8px; }
+  .badge-sector { font-size: 10px; background: rgba(196,132,252,0.12); color: var(--purple); border: 1px solid rgba(196,132,252,0.3); border-radius: 12px; padding: 2px 10px; }
+  /* TABS */
+  .tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; padding: 0 24px; gap: 2px; }
+  .tab { padding: 10px 18px; font-size: 12px; font-weight: 500; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; user-select: none; }
+  .tab:hover { color: var(--text-muted); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+  /* PANELS */
+  .panel { display: none; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .panel.active { display: block; }
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media(max-width: 900px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media(max-width: 600px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+  /* CARD */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .card-title { font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+  .card-val { font-size: 22px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
+  .card-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  /* SECTION HDR */
+  .sec-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; margin-top: 24px; }
+  .sec-hdr:first-child { margin-top: 0; }
+  .sec-hdr h3 { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sec-line { flex: 1; height: 1px; background: var(--border); }
+  /* SIGNAL BADGES */
+  .sg { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sa { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sr { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sb-sig { background: rgba(34,211,238,0.12); color: var(--cyan); border: 1px solid rgba(34,211,238,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sp { background: rgba(196,132,252,0.12); color: var(--purple); border: 1px solid rgba(196,132,252,0.25); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  .sn { background: rgba(148,163,184,0.1); color: var(--text-muted); border: 1px solid rgba(148,163,184,0.2); border-radius: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; display: inline-block; }
+  /* BARS */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .bar-label { font-size: 11px; color: var(--text-muted); min-width: 150px; }
+  .bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill-g { height: 100%; background: linear-gradient(90deg, #34d399, #059669); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-a { height: 100%; background: linear-gradient(90deg, #fbbf24, #d97706); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-r { height: 100%; background: linear-gradient(90deg, #f87171, #b91c1c); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-fill-b { height: 100%; background: linear-gradient(90deg, #4ade80, #16a34a); border-radius: 4px; transition: width 0.8s ease; }
+  .bar-val { font-size: 11px; font-family: var(--font-mono); color: var(--text); min-width: 56px; text-align: right; }
+  /* 52W RANGE */
+  .range-track { position: relative; background: var(--surface2); height: 6px; border-radius: 6px; margin: 12px 0 6px; }
+  .range-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--teal)); border-radius: 6px; }
+  .range-cursor { position: absolute; top: -4px; width: 14px; height: 14px; background: white; border: 2px solid var(--accent); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 0 3px rgba(74,222,128,0.3); }
+  .range-labels { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-dim); }
+  /* SCORE RING */
+  .score-ring-wrap { display: flex; align-items: center; gap: 20px; }
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid rgba(30,51,32,0.5); color: var(--text-muted); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .data-table .val { font-family: var(--font-mono); color: var(--text); }
+  /* TRENDS */
+  .trd-g { color: var(--green); }
+  .trd-r { color: var(--red); }
+  .trd-a { color: var(--amber); }
+  /* BEAT/MISS */
+  .bmc-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .bmc-beat { border: 1px solid rgba(52,211,153,0.4); background: rgba(52,211,153,0.08); color: var(--green); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: var(--font-mono); }
+  .bmc-miss { border: 1px solid rgba(248,113,113,0.4); background: rgba(248,113,113,0.08); color: var(--red); border-radius: 4px; padding: 4px 8px; font-size: 10px; font-family: var(--font-mono); }
+  /* FAIR VALUE */
+  .fv-bar-wrap { position: relative; height: 32px; border-radius: 6px; overflow: visible; display: flex; margin: 18px 0 8px; }
+  .fvz-u { background: rgba(52,211,153,0.18); border-radius: 6px 0 0 6px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--green); font-weight: 700; }
+  .fvz-f { background: rgba(74,222,128,0.14); height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--accent2); font-weight: 700; }
+  .fvz-p { background: rgba(248,113,113,0.14); border-radius: 0 6px 6px 0; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--red); font-weight: 700; }
+  .fv-cursor { position: absolute; top: -8px; bottom: -8px; width: 3px; background: white; border-radius: 2px; box-shadow: 0 0 8px rgba(255,255,255,0.6); transform: translateX(-50%); }
+  .fv-cursor-label { position: absolute; top: -24px; font-size: 10px; font-family: var(--font-mono); color: white; font-weight: 700; transform: translateX(-50%); white-space: nowrap; }
+  .fv-mos-pos { font-size: 11px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 4px; padding: 2px 10px; display: inline-block; }
+  .fv-mos-neg { font-size: 11px; background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 2px 10px; display: inline-block; }
+  /* RED FLAGS */
+  .rf-ok { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.25); border-radius: var(--radius); padding: 14px 16px; color: var(--green); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+  .rf-warn { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.3); border-radius: var(--radius); padding: 14px 16px; }
+  .rf-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(248,113,113,0.1); font-size: 12px; color: var(--text-muted); }
+  .rf-item:last-child { border-bottom: none; }
+  .rf-bullet { color: var(--red); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+  /* SIG GRID */
+  .sig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media(max-width: 700px) { .sig-grid { grid-template-columns: 1fr 1fr; } }
+  .sig-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; align-items: flex-start; gap: 12px; }
+  .sig-icon { font-size: 20px; flex-shrink: 0; }
+  .sig-name { font-size: 10px; color: var(--text-dim); font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; }
+  .sig-result { font-size: 13px; font-weight: 700; margin-top: 2px; }
+  /* MISC */
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(30,51,32,0.5); font-size: 12px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl { color: var(--text-muted); }
+  .info-val { font-family: var(--font-mono); color: var(--text); font-weight: 500; }
+  .chip { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--text-muted); margin: 2px; }
+  .mono { font-family: var(--font-mono); }
+  .green { color: var(--green); }
+  .amber { color: var(--amber); }
+  .red { color: var(--red); }
+  .cyan { color: var(--cyan); }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 4px; }
+  .peer-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .peer-table th { padding: 8px 10px; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-dim); background: var(--surface2); border-bottom: 1px solid var(--border); text-align: right; }
+  .peer-table th:first-child { text-align: left; }
+  .peer-table td { padding: 9px 10px; border-bottom: 1px solid rgba(30,51,32,0.5); color: var(--text-muted); text-align: right; font-family: var(--font-mono); }
+  .peer-table td:first-child { text-align: left; font-family: var(--font-sans); color: var(--text); }
+  .peer-table .best { color: var(--green); font-weight: 700; }
+  .peer-table .highlight-row td { background: rgba(74,222,128,0.05); }
+  .tag-star { color: var(--accent2); font-size: 9px; vertical-align: super; }
+  .overall-card { border: 1px solid var(--border2); border-radius: var(--radius); padding: 20px; background: linear-gradient(135deg, #0f1a10 0%, #162018 100%); margin-top: 16px; }
+  .overall-rating { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+  .scenario-bar-wrap { margin: 8px 0; }
+  .sbar-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .sbar-track { background: var(--surface2); border-radius: 4px; height: 24px; overflow: hidden; }
+  .sbar-fill { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; border-radius: 4px; transition: width 1s ease; }
+  .sbar-bull { background: linear-gradient(90deg, #34d399, #059669); color: #fff; }
+  .sbar-base { background: linear-gradient(90deg, #4ade80, #16a34a); color: #fff; }
+  .sbar-bear { background: linear-gradient(90deg, #f87171, #b91c1c); color: #fff; }
+  .news-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(30,51,32,0.5); }
+  .news-item:last-child { border-bottom: none; }
+  .news-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+  .news-dot.red { background: var(--red); }
+  .news-dot.amber { background: var(--amber); }
+  .news-body { font-size: 12px; color: var(--text-muted); }
+  .news-title { color: var(--text); font-weight: 500; margin-bottom: 2px; }
+  .news-meta { font-size: 10px; color: var(--text-dim); }
+  .catalyst-card { background: linear-gradient(135deg, rgba(74,222,128,0.06), rgba(45,212,191,0.06)); border: 1px solid rgba(74,222,128,0.2); border-radius: var(--radius); padding: 14px; }
+  .disclaimer { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 24px; font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+  .vbadge { font-size: 10px; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); border-radius: 12px; padding: 2px 10px; }
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+      <span class="ticker-tag">NSE: TRIDENT</span>
+      <span class="ticker-tag">BSE: 521064</span>
+      <span class="badge-sector">Textiles | Home Linen | Paper</span>
+      <span class="badge-verify">✓ Web-Verified Data</span>
+    </div>
+    <div class="stock-name">Trident Limited</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">World's Largest Terry Towel Manufacturer &nbsp;·&nbsp; 3-Year Investment Horizon</div>
+  </div>
+  <div class="cmp-block">
+    <div class="cmp-val">₹24.4</div>
+    <div class="cmp-sub">CMP as of Jun 12, 2026 &nbsp;|&nbsp; Mkt Cap: ₹12,414 Cr</div>
+    <div style="margin-top:4px;">
+      <span style="font-size:11px;color:var(--red);">▼ -27.4% from 52W High</span>
+      &nbsp;<span class="chip" style="font-size:10px;">All Time High: ₹70.90 (Jan 2022)</span>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab" onclick="showTab('overview')">📊 Overview</div>
+  <div class="tab" onclick="showTab('valuation')">💰 Valuation</div>
+  <div class="tab" onclick="showTab('growth')">📈 Growth</div>
+  <div class="tab" onclick="showTab('health')">🏭 Financial Health</div>
+  <div class="tab" onclick="showTab('ownership')">👥 Ownership</div>
+  <div class="tab" onclick="showTab('peers')">⚖️ Peers</div>
+  <div class="tab active" onclick="showTab('view')">★ View</div>
+  <div class="tab" onclick="showTab('news')">📰 News</div>
+</div>
+
+<!-- ═══ PANEL: OVERVIEW ═══ -->
+<div class="panel" id="panel-overview">
+  <div class="grid-4">
+    <div class="card"><div class="card-title">P/E Ratio (TTM)</div><div class="card-val amber">33.0×</div><div class="card-sub">vs sector median ~31×</div></div>
+    <div class="card"><div class="card-title">P/B Ratio</div><div class="card-val amber">2.64×</div><div class="card-sub">Book value ₹9.36/sh</div></div>
+    <div class="card"><div class="card-title">ROCE FY26</div><div class="card-val amber">9.86%</div><div class="card-sub">3Y Avg: ~10%</div></div>
+    <div class="card"><div class="card-title">ROE FY26</div><div class="card-val amber">8.03%</div><div class="card-sub">3Y Avg: 8.14%</div></div>
+    <div class="card"><div class="card-title">EBITDA Margin FY26</div><div class="card-val">14.0%</div><div class="card-sub">vs ~22% peak (FY22)</div></div>
+    <div class="card"><div class="card-title">Net D/E</div><div class="card-val green">0.22×</div><div class="card-sub">Net Debt ₹975 Cr (SAFE)</div></div>
+    <div class="card"><div class="card-title">Dividend Yield</div><div class="card-val green">2.07%</div><div class="card-sub">₹0.50/sh declared FY26</div></div>
+    <div class="card"><div class="card-title">Promoter Holding</div><div class="card-val green">73.68%</div><div class="card-sub">0% pledged ✓</div></div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>52-Week Price Range</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <!-- CMP ₹24.4, Low ₹21.98, High ₹33.66 → (24.4-21.98)/(33.66-21.98)*100 = 20.7% -->
+    <div class="range-track">
+      <div class="range-fill" style="width:100%"></div>
+      <div class="range-cursor" style="left:20.7%">
+        <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:10px;font-family:var(--font-mono);color:white;white-space:nowrap;font-weight:700;">₹24.4</div>
+      </div>
+    </div>
+    <div class="range-labels">
+      <span>52W Low: ₹21.98</span>
+      <span style="color:var(--accent2);">CMP: ₹24.4 (20.7% from low)</span>
+      <span>52W High: ₹33.66</span>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:6px;">All-Time High: ₹70.90 (Jan 2022) &nbsp;·&nbsp; Stock down ~65% from ATH — significant mean-reversion potential IF fundamentals recover</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Business Segments & Market Position</h3><div class="sec-line"></div></div>
+  <div class="grid-3">
+    <div class="card catalyst-card">
+      <div class="card-title" style="color:var(--teal);">🏭 Yarn (Q4 FY26: ₹851 Cr)</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">One of India's largest yarn producers. 458.4 MT/day capacity. Serves domestic & export markets.</div>
+    </div>
+    <div class="card catalyst-card">
+      <div class="card-title" style="color:var(--teal);">🛁 Home Textiles (Q4 FY26: ₹812 Cr)</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;"><strong style="color:var(--text);">World's largest terry towel manufacturer.</strong> 2nd largest home textile exporter from India. Clients: H&M, Walmart, Costco. 65-70% US-dependent.</div>
+    </div>
+    <div class="card catalyst-card">
+      <div class="card-title" style="color:var(--teal);">📄 Paper & Chemicals (Q4 FY26: ₹297 Cr)</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;"><strong style="color:var(--text);">World's largest wheat straw-based paper manufacturer.</strong> Saves 5,000 trees/day. #1 in North India branded copier segment. Highest OPM in listed paper peers.</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Annual Financial Summary</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Profit & Loss (FY26 Consolidated)</div>
+      <div class="info-row"><span class="info-lbl">Revenue</span><span class="info-val">₹6,775 Cr (-4% YoY)</span></div>
+      <div class="info-row"><span class="info-lbl">EBITDA</span><span class="info-val">₹951 Cr (-2% YoY)</span></div>
+      <div class="info-row"><span class="info-lbl">EBITDA Margin</span><span class="info-val">14.0% (stable)</span></div>
+      <div class="info-row"><span class="info-lbl">Net Profit</span><span class="info-val green">₹377 Cr (+2% YoY)</span></div>
+      <div class="info-row"><span class="info-lbl">EPS</span><span class="info-val">₹0.74</span></div>
+      <div class="info-row"><span class="info-lbl">Dividend Payout</span><span class="info-val">~68%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Balance Sheet & Cash Flow</div>
+      <div class="info-row"><span class="info-lbl">Total Assets</span><span class="info-val">₹7,537 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Debt</span><span class="info-val green">₹975 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Debt / EBITDA</span><span class="info-val green">1.02× (SAFE)</span></div>
+      <div class="info-row"><span class="info-lbl">OCF FY26</span><span class="info-val green">₹760 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">FCF FY26</span><span class="info-val green">₹461 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">OCF / Net Profit</span><span class="info-val green">2.02× (STRONG)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: VALUATION ═══ -->
+<div class="panel" id="panel-valuation">
+  <div class="sec-hdr"><h3>Valuation Assessment — Standard Metrics</h3><div class="sec-line"></div><span class="sa">EXPENSIVE on earnings, FAIR on book value</span></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">P/E Ratio Comparison</div>
+      <div class="bar-row"><span class="bar-label">Trident (Current TTM)</span><div class="bar-track"><div class="bar-fill-a" style="width:100%"></div></div><span class="bar-val amber">33.0×</span></div>
+      <div class="bar-row"><span class="bar-label">Sector Median</span><div class="bar-track"><div class="bar-fill-b" style="width:94%"></div></div><span class="bar-val">31.2×</span></div>
+      <div class="bar-row"><span class="bar-label">Trident 5Y Avg P/E</span><div class="bar-track"><div class="bar-fill-g" style="width:76%"></div></div><span class="bar-val">~25×</span></div>
+      <div style="font-size:10px;color:var(--amber);margin-top:8px;">⚠ Current P/E 33× is elevated versus historical avg ~25×, reflecting depressed earnings (FY26 profit near trough). On normalised FY27E earnings, P/E compresses significantly.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Valuation Summary</div>
+      <div class="info-row"><span class="info-lbl">P/E vs Sector Avg</span><span class="info-val"><span class="sa">SLIGHT PREMIUM</span></span></div>
+      <div class="info-row"><span class="info-lbl">P/E vs 5Y Own Avg</span><span class="info-val"><span class="sr">EXPENSIVE</span></span></div>
+      <div class="info-row"><span class="info-lbl">P/B (2.64×)</span><span class="info-val"><span class="sa">FAIR</span></span></div>
+      <div class="info-row"><span class="info-lbl">PEG Ratio</span><span class="info-val"><span class="sa">N/A (earnings declining)</span></span></div>
+      <div class="info-row"><span class="info-lbl">EV/EBITDA (est.)</span><span class="info-val"><span class="sg">~14× (REASONABLE)</span></span></div>
+      <div class="info-row"><span class="info-lbl">Overall Valuation</span><span class="info-val"><span class="sa">MIXED</span></span></div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Fair Value Range (Earnings Recovery Method)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">
+      FY27E normalised EPS ~₹1.0–₹1.2 (consensus). Historical P/E range: 20× (bear) → 28× (base) → 40× (bull, pre-tariff peak multiple).
+    </div>
+    <div class="grid-3 mb-4">
+      <div><div style="font-size:10px;color:var(--text-dim);">Bear Fair Value</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--red);">₹20</div><div style="font-size:10px;color:var(--text-dim);">₹1.0 EPS × 20× P/E</div></div>
+      <div><div style="font-size:10px;color:var(--text-dim);">Base Fair Value</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--accent2);">₹30</div><div style="font-size:10px;color:var(--text-dim);">₹1.1 EPS × 28× P/E</div></div>
+      <div><div style="font-size:10px;color:var(--text-dim);">Bull Fair Value</div><div style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:var(--green);">₹48</div><div style="font-size:10px;color:var(--text-dim);">₹1.2 EPS × 40× P/E</div></div>
+    </div>
+    <!-- Full range ₹17 (Bear×0.85) to ₹55 (Bull×1.15) = span 38 -->
+    <!-- Undervalued zone: ₹17→₹20 = 7.9% -->
+    <!-- Fair zone: ₹20→₹48 = 73.7% -->
+    <!-- Premium zone: ₹48→₹55 = 18.4% -->
+    <!-- CMP ₹24.4: (24.4-17)/38 = 19.5% -->
+    <div class="fv-bar-wrap">
+      <div class="fvz-u" style="width:7.9%">DEEP VALUE</div>
+      <div class="fvz-f" style="width:73.7%">FAIR ZONE</div>
+      <div class="fvz-p" style="width:18.4%">PREMIUM</div>
+      <div class="fv-cursor" style="left:19.5%">
+        <div class="fv-cursor-label">₹24.4</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:6px;display:flex;justify-content:space-between;">
+      <span>₹17</span><span>Bear FV ₹20</span><span>Base FV ₹30</span><span>Bull FV ₹48</span><span>₹55</span>
+    </div>
+    <div class="mt-12" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:var(--text-muted);">Margin of Safety vs Base FV:</span>
+      <span class="fv-mos-pos">+18.7% MOS</span>
+      <span style="font-size:11px;color:var(--text-dim);">(₹30 − ₹24.4) ÷ ₹30</span>
+    </div>
+    <div class="mt-8" style="font-size:11px;color:var(--teal);">💡 CMP ₹24.4 is comfortably within the FAIR ZONE but well below Bull FV of ₹48 — the upside is earnings-recovery driven: US tariff resolution + UK FTA + margin normalisation toward 18%+ are the triggers.</div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: GROWTH ═══ -->
+<div class="panel" id="panel-growth">
+  <div class="sec-hdr"><h3>Revenue & Profit CAGR</h3><div class="sec-line"></div><span class="sr">SLOWING / DECLINING (near-term)</span></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Revenue CAGR (Consolidated)</div>
+      <div class="bar-row"><span class="bar-label">10-Year CAGR</span><div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div><span class="bar-val">6%</span></div>
+      <div class="bar-row"><span class="bar-label">5-Year CAGR</span><div class="bar-track"><div class="bar-fill-b" style="width:67%"></div></div><span class="bar-val">8%</span></div>
+      <div class="bar-row"><span class="bar-label">3-Year CAGR</span><div class="bar-track"><div class="bar-fill-a" style="width:17%"></div></div><span class="bar-val amber">2%</span></div>
+      <div class="bar-row"><span class="bar-label">TTM (FY26)</span><div class="bar-track"><div class="bar-fill-r" style="width:33%"></div></div><span class="bar-val red">-4%</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: Screener.in. Revenue decline driven by US tariff-led demand slowdown in home textiles, particularly from H1 FY26. Q4 FY26 showed sequential recovery (+3% QoQ).</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Net Profit CAGR</div>
+      <div class="bar-row"><span class="bar-label">10-Year CAGR</span><div class="bar-track"><div class="bar-fill-b" style="width:83%"></div></div><span class="bar-val">5%</span></div>
+      <div class="bar-row"><span class="bar-label">5-Year CAGR</span><div class="bar-track"><div class="bar-fill-a" style="width:50%"></div></div><span class="bar-val amber">3%</span></div>
+      <div class="bar-row"><span class="bar-label">3-Year CAGR</span><div class="bar-track"><div class="bar-fill-r" style="width:42%"></div></div><span class="bar-val red">-5%</span></div>
+      <div class="bar-row"><span class="bar-label">TTM (FY26)</span><div class="bar-track"><div class="bar-fill-g" style="width:25%"></div></div><span class="bar-val green">+2%</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Profit bottomed in FY24 (₹350 Cr). FY25 ₹371 Cr, FY26 ₹377 Cr — slow but positive trajectory. FY22 peak ₹834 Cr shows the earnings recovery potential. Source: Screener.in</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Quarterly EPS Trend (Last 8 Quarters)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="data-table">
+      <tr><th>Quarter</th><th>Revenue (₹ Cr)</th><th>EBITDA Margin</th><th>Net Profit (₹ Cr)</th><th>EPS (₹)</th><th>YoY</th></tr>
+      <tr><td>Q1 FY25</td><td class="val">1,743</td><td class="val">13%</td><td class="val">74</td><td class="val">0.14</td><td><span class="trd-r red">▼</span></td></tr>
+      <tr><td>Q2 FY25</td><td class="val">1,713</td><td class="val">13%</td><td class="val">83</td><td class="val">0.16</td><td><span class="trd-a amber">◆</span></td></tr>
+      <tr><td>Q3 FY25</td><td class="val">1,667</td><td class="val">13%</td><td class="val">80</td><td class="val">0.16</td><td><span class="trd-r red">▼</span></td></tr>
+      <tr><td>Q4 FY25</td><td class="val">1,864</td><td class="val">13%</td><td class="val">133</td><td class="val">0.26</td><td><span class="trd-g green">▲</span></td></tr>
+      <tr><td>Q1 FY26</td><td class="val">1,707</td><td class="val">17%</td><td class="val">140</td><td class="val">0.27</td><td><span class="trd-g green">▲ +89%</span></td></tr>
+      <tr><td>Q2 FY26</td><td class="val">1,787</td><td class="val">12%</td><td class="val">91</td><td class="val">0.18</td><td><span class="trd-g green">▲ +10%</span></td></tr>
+      <tr><td>Q3 FY26</td><td class="val">1,574</td><td class="val">9%</td><td class="val">44</td><td class="val amber">0.09</td><td><span class="trd-r red">▼ -45%</span></td></tr>
+      <tr><td>Q4 FY26</td><td class="val">1,633</td><td class="val">15%</td><td class="val">102</td><td class="val">0.20</td><td><span class="trd-r red">▼ -23% YoY</span></td></tr>
+    </table>
+    <div style="font-size:11px;color:var(--amber);margin-top:10px;">⚠ Q3 FY26 was the trough — EBITDA margin collapsed to 9% due to US tariff-led demand slowdown + inventory destock. Q4 FY26 showed strong sequential recovery: EBITDA +56% QoQ, Profit +131% QoQ, Margin back to 15%. Source: Screener.in / EquityBulls.</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Earnings Beat / Miss</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="bmc-row">
+      <span class="bmc-beat">Q1 FY25 ✓</span>
+      <span class="bmc-miss">Q2 FY25 ✗</span>
+      <span class="bmc-miss">Q3 FY25 ✗</span>
+      <span class="bmc-beat">Q4 FY25 ✓</span>
+      <span class="bmc-beat">Q1 FY26 ✓</span>
+      <span class="bmc-miss">Q2 FY26 ✗</span>
+      <span class="bmc-miss">Q3 FY26 ✗</span>
+      <span class="bmc-beat">Q4 FY26 ✓</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">
+      <strong class="amber">4 of 8 Beats</strong> &nbsp;→&nbsp; Classification: <span class="sa">INCONSISTENT</span>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">Volatile quarterly performance driven by US demand cycles, tariff uncertainty, and cotton price swings. Source: MOFSL / YES Securities analyst estimates vs actuals.</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Forward Projections (3-Year Horizon to FY29)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px;">Base: Revenue 5Y CAGR 8% × 0.85 = ~7%; Bear: ×0.50 = ~4%; Bull: ×1.15 = ~9.4% (UK FTA + US tariff normalisation)</div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">🐂 Bull: Revenue CAGR ~9.4%, margin recovery to 18% → FY29E Revenue ₹8,800 Cr, PAT ~₹700 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-bull" style="width:100%">₹8,800 Cr Rev · PAT ₹700 Cr</div></div>
+    </div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">📊 Base: Revenue CAGR ~7%, margin stable at 14-15% → FY29E Revenue ₹8,300 Cr, PAT ~₹550 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-base" style="width:80%">₹8,300 Cr Rev · PAT ₹550 Cr</div></div>
+    </div>
+    <div class="scenario-bar-wrap">
+      <div class="sbar-label">🐻 Bear: Revenue CAGR ~4%, margin stays depressed 11-12% → FY29E Revenue ₹7,600 Cr, PAT ~₹350 Cr</div>
+      <div class="sbar-track"><div class="sbar-fill sbar-bear" style="width:50%">₹7,600 Cr Rev · PAT ₹350 Cr</div></div>
+    </div>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:10px;">Bull case requires: India-US trade deal (tariff below 15%), UK FTA orders materialising FY27, cotton price stability, and EBITDA margin recovery to 17-18% (pre-FY23 levels).</div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: FINANCIAL HEALTH ═══ -->
+<div class="panel" id="panel-health">
+  <div class="sec-hdr"><h3>Debt & Leverage</h3><div class="sec-line"></div><span class="sg">SAFE — LOW LEVERAGE</span></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Debt Metrics</div>
+      <div class="info-row"><span class="info-lbl">Gross Borrowings FY26</span><span class="info-val">₹1,829 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Debt (Mar 2026)</span><span class="info-val green">₹975 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Net Debt / EBITDA</span><span class="info-val green">1.02× (SAFE &lt;2×)</span></div>
+      <div class="info-row"><span class="info-lbl">Net Debt / Equity</span><span class="info-val green">0.22× (LOW)</span></div>
+      <div class="info-row"><span class="info-lbl">Debt-to-EBITDA (gross)</span><span class="info-val green">1.56× (MANAGEABLE)</span></div>
+      <div class="info-row"><span class="info-lbl">LT Debt FY26</span><span class="info-val green">₹963 Cr ↓ (deleveraging)</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: MarketsMojo / EquityBulls Q4 FY26 results. LT debt declined from ₹1,173 Cr (FY25) to ₹963 Cr (FY26) — active deleveraging.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Liquidity & Working Capital</div>
+      <div class="info-row"><span class="info-lbl">Current Assets</span><span class="info-val">₹2,510 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Current Liabilities</span><span class="info-val">₹1,250 Cr</span></div>
+      <div class="info-row"><span class="info-lbl">Current Ratio</span><span class="info-val green">~2.0× (COMFORTABLE)</span></div>
+      <div class="info-row"><span class="info-lbl">Working Capital Days FY26</span><span class="info-val green">16 days (best in 5Y)</span></div>
+      <div class="info-row"><span class="info-lbl">Debtor Days FY26</span><span class="info-val green">13 days ↓ (improving)</span></div>
+      <div class="info-row"><span class="info-lbl">Inventory Days</span><span class="info-val amber">128 days (high, typical for textiles)</span></div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Cash Flow Quality (Last 3 Years)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="data-table">
+      <tr><th>Year</th><th>OCF (₹ Cr)</th><th>FCF (₹ Cr)</th><th>Net Profit (₹ Cr)</th><th>OCF/NP</th><th>Earnings Quality</th></tr>
+      <tr><td>FY24</td><td class="val amber">287</td><td class="val red">-351</td><td class="val">350</td><td class="val amber">0.82×</td><td><span class="sa">WATCH</span></td></tr>
+      <tr><td>FY25</td><td class="val green">945</td><td class="val green">718</td><td class="val">371</td><td class="val green">2.55×</td><td><span class="sg">STRONG</span></td></tr>
+      <tr><td>FY26</td><td class="val green">760</td><td class="val green">461</td><td class="val">377</td><td class="val green">2.02×</td><td><span class="sg">STRONG</span></td></tr>
+    </table>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">FY24 FCF was negative due to ₹2,000 Cr capex expansion cycle. FY25-26 show strong cash generation as capex normalises. OCF/NP above 2× in FY25-26 = very high earnings quality. Source: Screener.in</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>EBITDA Margin Trend</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="bar-row"><span class="bar-label">FY22 (Peak)</span><div class="bar-track"><div class="bar-fill-g" style="width:100%"></div></div><span class="bar-val green">22%</span></div>
+    <div class="bar-row"><span class="bar-label">FY23</span><div class="bar-track"><div class="bar-fill-a" style="width:68%"></div></div><span class="bar-val">15%</span></div>
+    <div class="bar-row"><span class="bar-label">FY24</span><div class="bar-track"><div class="bar-fill-a" style="width:64%"></div></div><span class="bar-val">14%</span></div>
+    <div class="bar-row"><span class="bar-label">FY25</span><div class="bar-track"><div class="bar-fill-a" style="width:59%"></div></div><span class="bar-val">13%</span></div>
+    <div class="bar-row"><span class="bar-label">FY26 (Full Year)</span><div class="bar-track"><div class="bar-fill-b" style="width:64%"></div></div><span class="bar-val">14%</span></div>
+    <div class="bar-row"><span class="bar-label">Q4 FY26 (Sequential)</span><div class="bar-track"><div class="bar-fill-g" style="width:68%"></div></div><span class="bar-val green">15.05% ▲</span></div>
+    <div style="font-size:11px;color:var(--teal);margin-top:10px;">💡 Margins compressing from 22% peak (FY22 post-COVID demand surge) to 13-14% trough. Recovery to 17-18% is the base case IF US tariff uncertainty resolves and UK FTA flows through. Source: Screener.in / EquityBulls</div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: OWNERSHIP ═══ -->
+<div class="panel" id="panel-ownership">
+  <div class="sec-hdr"><h3>Shareholding Pattern (Mar 2026)</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Ownership Breakdown</div>
+      <div class="info-row"><span class="info-lbl">Promoter Holding</span><span class="info-val green">73.68% — STABLE</span></div>
+      <div class="info-row"><span class="info-lbl">Promoter Pledging</span><span class="info-val green">0.00% — CLEAN</span></div>
+      <div class="info-row"><span class="info-lbl">FII / FPI</span><span class="info-val">3.16%</span></div>
+      <div class="info-row"><span class="info-lbl">DII</span><span class="info-val amber">0.19% (very low)</span></div>
+      <div class="info-row"><span class="info-lbl">Retail / Public</span><span class="info-val">~22.97%</span></div>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: Choice India / Angel One. Very low institutional interest (FII+DII ~3.35% combined) — a double-edged sword: little coverage, but massive rerating potential if institutions enter on recovery thesis.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Promoter & Institutional Trend</div>
+      <div class="info-row"><span class="info-lbl">Promoter Trend (last 8Q)</span><span class="info-val green">STABLE (no sales)</span></div>
+      <div class="info-row"><span class="info-lbl">FII Trend</span><span class="info-val amber">SLIGHT INCREASE recently</span></div>
+      <div class="info-row"><span class="info-lbl">DII Trend</span><span class="info-val amber">MINIMAL / FLAT</span></div>
+      <div class="info-row"><span class="info-lbl">Pledging Risk</span><span class="info-val green">ZERO</span></div>
+      <div style="font-size:10px;color:var(--teal);margin-top:8px;">💡 Key positive: Strong promoter conviction (73.68% stable, zero pledging). Key risk: Near-zero institutional participation means the stock is retail-driven — prone to sentiment swings.</div>
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Management Accountability (Last 4 Quarters)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div style="overflow-x:auto;">
+      <div style="display:grid;grid-template-columns:140px 190px 190px 110px;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;">Quarter</span>
+        <span style="font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;">Guidance</span>
+        <span style="font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;">Actual</span>
+        <span style="font-size:10px;font-weight:600;color:var(--text-dim);text-transform:uppercase;">Verdict</span>
+      </div>
+      <div style="display:grid;grid-template-columns:140px 190px 190px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,51,32,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q1 FY26</span>
+        <span style="color:var(--text-muted);">Revenue recovery, margin ~15%</span>
+        <span style="color:var(--text-muted);">Rev ₹1,707 Cr, OPM 17%, PAT ₹140 Cr ✓</span>
+        <span class="sg">BEAT</span>
+      </div>
+      <div style="display:grid;grid-template-columns:140px 190px 190px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,51,32,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q2 FY26</span>
+        <span style="color:var(--text-muted);">Sustained momentum</span>
+        <span style="color:var(--text-muted);">OPM fell to 12%; PAT ₹91 Cr — below expectation</span>
+        <span class="sr">MISSED</span>
+      </div>
+      <div style="display:grid;grid-template-columns:140px 190px 190px 110px;gap:6px;padding:8px 0;border-bottom:1px solid rgba(30,51,32,0.5);font-size:11px;">
+        <span style="color:var(--text-muted);">Q3 FY26</span>
+        <span style="color:var(--text-muted);">US tariff positive revision support</span>
+        <span style="color:var(--text-muted);">Rev -5.8% YoY, PAT ₹44 Cr — severe miss on tariff impact</span>
+        <span class="sr">MISSED</span>
+      </div>
+      <div style="display:grid;grid-template-columns:140px 190px 190px 110px;gap:6px;padding:8px 0;font-size:11px;">
+        <span style="color:var(--text-muted);">Q4 FY26</span>
+        <span style="color:var(--text-muted);">Sequential recovery, balance sheet strength</span>
+        <span style="color:var(--text-muted);">PAT +131% QoQ, EBITDA +56% QoQ — recovery confirmed ✓</span>
+        <span class="sg">MET</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+      Execution Score: <strong class="amber">2/4 = MIXED</strong> — management navigated genuine external headwinds (US tariffs) but communications on severity lagged market reality.
+    </div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Corporate Events (FY26)</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="info-row"><span class="info-lbl">CFO Resignation</span><span class="info-val amber">Avneesh Barua resigned May 29, 2026 (personal reasons)</span></div>
+    <div class="info-row"><span class="info-lbl">Prior CFO Resignation</span><span class="info-val amber">Rahul Roongta resigned Jan 2026 as Group CFO</span></div>
+    <div class="info-row"><span class="info-lbl">CEO - Bed Linen</span><span class="info-val amber">Kamal Gaba resigned Aug 31, 2025</span></div>
+    <div class="info-row"><span class="info-lbl">India Ratings NCD</span><span class="info-val green">IND AA / Stable — strong credit profile</span></div>
+    <div class="info-row"><span class="info-lbl">TEXPROCIL Gold Trophy</span><span class="info-val green">Highest Global Exports — May 25, 2026 ✓</span></div>
+    <div style="font-size:10px;color:var(--amber);margin-top:8px;">⚠ 2 CFO exits within 6 months is a governance yellow flag — warrants monitoring. However, operating performance and credit rating remain strong.</div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: PEERS ═══ -->
+<div class="panel" id="panel-peers">
+  <div class="sec-hdr"><h3>Peer Comparison — Indian Home Textile / Yarn Space</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <table class="peer-table">
+      <tr>
+        <th>Company</th><th>Mkt Cap</th><th>P/E</th><th>P/B</th><th>ROE</th><th>EBITDA Mgn</th><th>D/E</th><th>Status</th>
+      </tr>
+      <tr class="highlight-row">
+        <td><strong>Trident Ltd</strong> <span class="tag-star">★</span></td>
+        <td>₹12,414 Cr</td>
+        <td class="amber">33.0×</td>
+        <td>2.64×</td>
+        <td class="amber">8.0%</td>
+        <td>14.0%</td>
+        <td class="best">0.22×</td>
+        <td><span class="sa">MID-PACK</span></td>
+      </tr>
+      <tr>
+        <td>Welspun Living</td>
+        <td>~₹8,000 Cr</td>
+        <td>~25×</td>
+        <td class="best">~2.1×</td>
+        <td>~9%</td>
+        <td class="best">~16%</td>
+        <td>~0.3×</td>
+        <td><span class="sa">MID-PACK</span></td>
+      </tr>
+      <tr>
+        <td>Vardhman Textiles</td>
+        <td>~₹12,000 Cr</td>
+        <td class="best">~18×</td>
+        <td>~1.8×</td>
+        <td>~11%</td>
+        <td>~15%</td>
+        <td>~0.15×</td>
+        <td><span class="sg">LEADING</span></td>
+      </tr>
+      <tr>
+        <td>Indo Count Industries</td>
+        <td>~₹4,500 Cr</td>
+        <td>~22×</td>
+        <td>~3.0×</td>
+        <td class="best">~15%</td>
+        <td>~14%</td>
+        <td>~0.1×</td>
+        <td><span class="sg">LEADING</span></td>
+      </tr>
+    </table>
+    <div style="font-size:10px;color:var(--text-dim);margin-top:8px;">Source: BSE/NSE market data, analyst reports. Trident's lowest D/E is a clear strength. ROE of 8% and P/E of 33× (on trough earnings) are the weak spots.</div>
+  </div>
+
+  <div class="sec-hdr mt-16"><h3>Why Trident vs Peers</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="color:var(--green);">Trident Structural Edges</div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body"><div class="news-title">World's #1 Terry Towel Manufacturer</div>Scale and cost efficiency unmatched globally — acts as a durable competitive moat in a commodity-like industry.</div></div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body"><div class="news-title">Paper segment — highest OPM among listed peers</div>Wheat straw-based paper is a unique, eco-friendly moat that domestic competitors cannot easily replicate.</div></div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body"><div class="news-title">Zero promoter pledging + 73.7% holding</div>Strong founder alignment; no financial distress risk from promoter side.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--amber);">Where Peers Lead</div>
+      <div class="news-item"><div class="news-dot red"></div><div class="news-body"><div class="news-title">ROE: Indo Count 15% vs Trident 8%</div>Peers show better capital efficiency — Trident's ROE has been structurally declining since FY22 peak of ~25%.</div></div>
+      <div class="news-item"><div class="news-dot amber"></div><div class="news-body"><div class="news-title">US concentration: Trident 65-70% vs peers more diversified</div>Trident more exposed than most peers to US tariff risk; diversification is underway but slow.</div></div>
+      <div class="news-item"><div class="news-dot amber"></div><div class="news-body"><div class="news-title">P/E: Vardhman at 18× vs Trident 33×</div>On normalised earnings, Trident's valuation premium to Vardhman appears unjustified unless margin recovery materialises.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: VIEW ★ (DEFAULT ACTIVE) ═══ -->
+<div class="panel active" id="panel-view">
+
+  <div class="sec-hdr"><h3>Overall Signal Dashboard</h3><div class="sec-line"></div></div>
+  <div class="grid-2">
+    <!-- Score Ring: Confidence 7.5/10 (MODERATE-HIGH) -->
+    <!-- dashoffset = 251.33 × (1 - 7.5/11) = 251.33 × 0.318 = 79.9 -->
+    <div class="card" style="display:flex;align-items:center;gap:24px;">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#fbbf24" stroke-width="12"
+          stroke-dasharray="251.33" stroke-dashoffset="79.9"
+          stroke-linecap="round" transform="rotate(-90 55 55)"/>
+        <text x="55" y="51" text-anchor="middle" fill="#e6ede6" font-size="20" font-weight="700" font-family="monospace">7.5</text>
+        <text x="55" y="66" text-anchor="middle" fill="#93a893" font-size="9">/10 Confidence</text>
+      </svg>
+      <div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px;">DATA CONFIDENCE</div>
+        <div style="font-size:18px;font-weight:800;color:var(--amber);">MODERATE-HIGH</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:4px;">35/35 data points verified</div>
+        <div style="margin-top:10px;"><span class="vbadge">✓ Web-Verified Data</span></div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:6px;">Generated: Jun 16, 2026</div>
+      </div>
+    </div>
+
+    <div class="card overall-card">
+      <div style="font-size:10px;color:var(--text-dim);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">3-Year Investment View</div>
+      <div class="overall-rating amber">MODERATE ↗</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;line-height:1.6;">
+        A world-class manufacturer at cyclical trough valuations. Near-term earnings are under pressure from US tariff headwinds and compressed margins. The 3-year thesis rests on earnings recovery via UK FTA, US tariff normalisation, and margin expansion toward 17-18%.
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip" style="color:var(--green);">19% MOS vs Base FV ₹30</span>
+        <span class="chip" style="color:var(--teal);">UK FTA catalyst</span>
+        <span class="chip" style="color:var(--amber);">Trough earnings risk</span>
+        <span class="chip" style="color:var(--red);">CFO churn concern</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 Signals -->
+  <div class="sec-hdr mt-16"><h3>6 Core Investment Signals</h3><div class="sec-line"></div></div>
+  <div class="sig-grid">
+    <div class="sig-card">
+      <div class="sig-icon">💰</div>
+      <div>
+        <div class="sig-name">Valuation</div>
+        <div class="sig-result" style="color:var(--amber);">MIXED</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">P/E 33× (expensive on trough EPS), P/B 2.64× (fair), EV/EBITDA ~14× (reasonable)</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">📈</div>
+      <div>
+        <div class="sig-name">Growth</div>
+        <div class="sig-result" style="color:var(--red);">DECLINING</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Rev -4% TTM; 3Y profit CAGR -5%; Q4 recovery nascent</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">🏭</div>
+      <div>
+        <div class="sig-name">Financial Health</div>
+        <div class="sig-result" style="color:var(--green);">STRONG</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">Net D/E 0.22×; FCF ₹461 Cr; OCF/NP 2.0×; IND AA rated</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">📊</div>
+      <div>
+        <div class="sig-name">Returns</div>
+        <div class="sig-result" style="color:var(--red);">WEAK</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">ROE 8%; ROCE 9.86%; below cost of capital. 3Y avg ROE 8.14%</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">⚙️</div>
+      <div>
+        <div class="sig-name">Capital Allocation</div>
+        <div class="sig-result" style="color:var(--amber);">AVERAGE (1.5/3)</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">High dividend payout (68%), but ROIC below WACC; capex discipline improving</div>
+      </div>
+    </div>
+    <div class="sig-card">
+      <div class="sig-icon">🎯</div>
+      <div>
+        <div class="sig-name">Earnings Consistency</div>
+        <div class="sig-result" style="color:var(--amber);">INCONSISTENT</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:3px;">4/8 quarters beat; volatile due to macro dependency</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capital Allocation -->
+  <div class="sec-hdr mt-16"><h3>Capital Allocation Scorecard</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="info-row">
+      <span class="info-lbl">ROIC vs WACC (est. ~11%)</span>
+      <span class="info-val"><span style="font-size:13px;color:var(--red);font-weight:700;">✗</span> ROCE 9.86% &lt; WACC ~11% — value destructive at current margins</span>
+    </div>
+    <div class="info-row">
+      <span class="info-lbl">Shareholder Returns (Dividend)</span>
+      <span class="info-val"><span style="font-size:13px;color:var(--green);font-weight:700;">✓</span> 68% payout ratio; consistent ₹0.36–₹0.50/sh over 5Y; Yield 2.07%</span>
+    </div>
+    <div class="info-row">
+      <span class="info-lbl">Capex Discipline</span>
+      <span class="info-val"><span style="font-size:13px;color:var(--amber);font-weight:700;">~</span> FY24 ₹2,000 Cr capex inflated FCF; FY26 capex normalised; discipline returning</span>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-muted);">Score: <strong class="amber">1.5/3 → AVERAGE</strong></div>
+  </div>
+
+  <!-- Red Flags -->
+  <div class="sec-hdr mt-16"><h3>🚨 Red Flags Checklist</h3><div class="sec-line"></div></div>
+  <div class="rf-warn">
+    <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:10px;">⚠ 3 Red Flags / Yellow Flags Identified</div>
+    <div class="rf-item">
+      <span class="rf-bullet">●</span>
+      <div>
+        <strong style="color:var(--text);">High US Revenue Concentration (65-70% of Home Textile from US)</strong><br>
+        Trident derives ~65-70% of its home textile revenues (which is 52-53% of total revenue) from the US market — making it highly vulnerable to US tariff policy changes. The 26% reciprocal tariff announcement severely impacted Q3 FY26 performance.
+      </div>
+    </div>
+    <div class="rf-item">
+      <span class="rf-bullet">●</span>
+      <div>
+        <strong style="color:var(--text);">Double CFO Exit in 6 Months (Jan 2026 + May 2026)</strong><br>
+        Group CFO Rahul Roongta resigned January 2026; CFO Avneesh Barua resigned May 29, 2026. Two senior finance exits in 6 months is unusual and warrants monitoring, though both cited personal reasons and the company holds IND AA credit rating.
+      </div>
+    </div>
+    <div class="rf-item">
+      <span class="rf-bullet">●</span>
+      <div>
+        <strong style="color:var(--text);">ROCE Below Cost of Capital for 3 Consecutive Years</strong><br>
+        ROCE has been below 12% since FY23 (peaking at 23% in FY22), currently at 9.86%. This indicates the company is not generating returns above its cost of capital — a structural red flag unless margins recover.
+      </div>
+    </div>
+  </div>
+  <div class="mt-12 card" style="background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.1);">
+    <div style="font-size:11px;color:var(--text-muted);">
+      ✅ Zero Promoter Pledging &nbsp;|&nbsp; ✅ No Auditor Qualification &nbsp;|&nbsp; ✅ No RPT issues &nbsp;|&nbsp; ✅ IND AA / Stable Credit Rating &nbsp;|&nbsp; ✅ Current Ratio ~2.0× &nbsp;|&nbsp; ✅ Working Capital improving (16 days) &nbsp;|&nbsp; ✅ Promoter holding stable at 73.7%
+    </div>
+  </div>
+
+  <!-- Strengths Risks -->
+  <div class="sec-hdr mt-16"><h3>3 Strengths · 2 Risks · 1 Thing to Track</h3><div class="sec-line"></div></div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title" style="color:var(--green);">Top 3 Strengths</div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body">World's largest terry towel manufacturer — a genuinely rare title that creates scale-based moat in a global commodity space</div></div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body">Ultra-clean balance sheet: Net D/E 0.22×, IND AA rating, positive FCF for 2 consecutive years — built to survive a cycle</div></div>
+      <div class="news-item"><div class="news-dot"></div><div class="news-body">India-UK FTA (2025) + India's competitive US tariff position (18% vs competition 19-20%+) are structural tailwinds for FY27</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red);">Top 2 Risks</div>
+      <div class="news-item"><div class="news-dot red"></div><div class="news-body">US tariff escalation re-emergence — if US implements 26%+ tariff on Indian textiles, Q3 FY26-style collapse would recur, erasing the recovery thesis</div></div>
+      <div class="news-item"><div class="news-dot red"></div><div class="news-body">Structural margin compression — if EBITDA stays below 14%, the current P/E of 33× on trough EPS remains unjustifiable; extended re-rating is at risk</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--teal);">1 Thing to Track</div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);margin: 10px 0 6px;">EBITDA Margin in Q1 FY27</div>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">If Q1 FY27 EBITDA margin sustains above 16-17% (indicating Q3 FY26 was a true trough), the stock can re-rate toward ₹35-40 as institutional participation builds. If margin falls back to 9-10%, the bear case dominates and stock tests ₹20-22 levels again.</div>
+    </div>
+  </div>
+
+  <!-- Catalysts Box -->
+  <div class="sec-hdr mt-16"><h3>3-Year Investment Thesis Catalysts</h3><div class="sec-line"></div></div>
+  <div class="catalyst-card">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--teal);letter-spacing:0.6px;margin-bottom:6px;">CATALYST 1 — UK FTA</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">India-UK FTA (2025) eliminates tariffs on Indian textile exports to UK. Full benefits materialise by FY27. UK could be a high-growth, margin-accretive diversification from US dependency.</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--teal);letter-spacing:0.6px;margin-bottom:6px;">CATALYST 2 — US TARIFF RESET</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">India at 18% tariff vs competition at 19-20%+. India-US trade deal (under negotiation) could further reduce tariffs, reversing the demand compression that caused Q3 FY26 collapse.</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--teal);letter-spacing:0.6px;margin-bottom:6px;">CATALYST 3 — MARGIN RECOVERY</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">EBITDA margin returning from 9% trough to 17-18% pre-FY23 levels would triple net profit on same revenue. At ₹700 Cr normalised PAT and 28× P/E, stock would be ~₹39. Cost optimisation programme underway.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL: NEWS ═══ -->
+<div class="panel" id="panel-news">
+  <div class="sec-hdr"><h3>Top 10 News Items — Long-Term Investor Relevance</h3><div class="sec-line"></div></div>
+  <div class="card">
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">TEXPROCIL Gold Trophy — Highest Global Exporter from India (May 2026)</div>
+        Trident won the TEXPROCIL Gold Trophy for being India's highest global home textile exporter — reinforcing its world-class export franchise despite tariff headwinds.
+        <div class="news-meta">May 25, 2026 · Screener.in Announcement</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">Q4 FY26: PAT +131% QoQ to ₹102 Cr; EBITDA Margin Recovers to 15%</div>
+        Strong sequential recovery confirms Q3 FY26 was the trough. Annual PAT +2% YoY to ₹377 Cr; net debt stable at ₹975 Cr. Board declared ₹0.50/share interim dividend.
+        <div class="news-meta">May 19, 2026 · EquityBulls / InvestyWise</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot amber"></div>
+      <div class="news-body">
+        <div class="news-title">CFO Avneesh Barua Resigns — Second CFO Exit in 6 Months</div>
+        After Group CFO Rahul Roongta's Jan 2026 exit, CFO Avneesh Barua cited personal reasons and resigned May 29, 2026. Finance leadership continuity is a concern; new appointment pending.
+        <div class="news-meta">May 25, 2026 · Groww / Screener.in</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">India-UK FTA Signed — Textile Exporters Among Biggest Beneficiaries</div>
+        UK now offers 0% tariff on Indian textile exports, putting Trident on equal footing with Bangladesh and ahead of China. Full FY27 order book impact expected from Q2 FY27 onwards.
+        <div class="news-meta">2025 · Upstox / Commenda</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">India Ratings Affirms Trident NCDs at IND AA / Stable — Approves ₹500 Cr NCD Raise</div>
+        Credit rating reaffirmed even during the earnings downturn, indicating strong underlying balance sheet. Board approved ₹500 Cr NCD raising for working capital and growth.
+        <div class="news-meta">2026 · Groww / India Ratings</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot red"></div>
+      <div class="news-body">
+        <div class="news-title">Q3 FY26: PAT -45.8% YoY — US Tariff Shock Hit Home Textile Demand</div>
+        Worst quarter in years: Rev -5.8% YoY, EBITDA margin collapsed to 9.99%, PAT ₹44 Cr. US reciprocal tariff announcement in early 2026 led to customer destocking and order deferrals.
+        <div class="news-meta">February 9, 2026 · MarketScreener</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">Trident Shares Jump 7% on ₹250 Cr Investment in Trident Global Corp</div>
+        Trident acquired 30.42% stake in Trident Global Corp for ₹250 Cr — a strategic step to expand its international distribution and build a DTC (direct-to-consumer) global brand presence.
+        <div class="news-meta">September 10, 2025 · Business Standard</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">Faze Three, Indo Count, Trident Rally 5-12% on India-US Trade Talk Revival</div>
+        Home textile stocks rallied sharply in September 2025 as US-India trade negotiations resumed and reciprocal tariff fears eased — showcasing the sentiment sensitivity to trade policy.
+        <div class="news-meta">September 10, 2025 · Business Standard</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot" style="background:var(--green)"></div>
+      <div class="news-body">
+        <div class="news-title">5.40 MWp Rooftop Solar Commissioned at Budhni — Total 57.32 MWp Capacity</div>
+        Trident's investment (~₹10 Cr) in rooftop solar reduces energy costs and supports ESG credentials. Integrated energy operations (captive power) are a core cost advantage.
+        <div class="news-meta">March 27, 2026 · Nirmal Bang / BSE Announcement</div>
+      </div>
+    </div>
+    <div class="news-item">
+      <div class="news-dot amber"></div>
+      <div class="news-body">
+        <div class="news-title">Management: "US Tariff Revisions Are a Positive Development" — Q3 FY26 Call</div>
+        MD Deepak Nanda expressed confidence in resilience and noted India's improved 18% tariff vs competitors at 19-20%+. UK FTA noted as an order diversification catalyst. FY27 guidance cautiously optimistic.
+        <div class="news-meta">February 10, 2026 · BSE Filing Q3 FY26</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div style="padding: 0 24px 24px; max-width:1400px; margin: 0 auto;">
+  <div class="disclaimer">
+    <strong style="color:var(--text-muted);">SEBI Disclaimer:</strong> This report is prepared for informational and educational purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell securities. The information herein is based on publicly available data and web-verified sources as of June 16, 2026. Past performance is not indicative of future returns. Investment in equity markets is subject to market risks. Please read all scheme-related documents carefully before investing. Consult a SEBI-registered investment advisor before making investment decisions.
+    <br><br>
+    <strong style="color:var(--text-muted);">Prepared by:</strong> Kushal Lunia &nbsp;|&nbsp; CA Final Candidate &nbsp;|&nbsp; EY (Big 4) & UBS Experience &nbsp;|&nbsp;
+    <a href="https://www.linkedin.com/in/kushal-lunia-7b9585138/" target="_blank" style="color:var(--accent2); text-decoration:none;">🔗 LinkedIn Profile</a>
+    &nbsp;|&nbsp; <strong>Generated:</strong> June 16, 2026, 00:00 IST
+    <br><br>
+    <span style="color:var(--text-dim);">Data Sources: Screener.in · NSE India · BSE India · EquityBulls · InvestyWise · Groww · MarketsMojo · Choice India · Angel One · CARE Ratings · India Ratings · Business Standard · TEXPROCIL · BSE Corporate Filings</span>
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const bars = document.querySelectorAll('.bar-fill-g, .bar-fill-a, .bar-fill-r, .bar-fill-b, .sbar-fill');
+  bars.forEach(bar => {
+    const targetW = bar.style.width;
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = targetW; }, 200);
+  });
+});
+</script>
+</body>
+</html>
