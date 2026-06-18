@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Micron Technology, Inc. (NASDAQ: MU) — 5-Year Research Terminal</title>
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#0f1520; --card:#121925; --card2:#161f2e; --border:#1f2b3d;
+  --text:#e6edf5; --text2:#9aabc2; --text3:#6b7f99;
+  --cyan:#22d3ee; --cyan-dim:#0e7490;
+  --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --green-bg:rgba(52,211,153,.12); --amber-bg:rgba(251,191,36,.12); --red-bg:rgba(248,113,113,.12); --cyan-bg:rgba(34,211,238,.12);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);margin:0;padding:0;font-size:14px;line-height:1.5;}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 18px 60px;}
+h1,h2,h3,h4{margin:0 0 8px;font-weight:700;}
+h1{font-size:22px;} h2{font-size:17px;color:var(--cyan);} h3{font-size:14px;color:var(--text);} h4{font-size:12.5px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;}
+p{margin:0 0 10px;color:var(--text2);}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
+.card2{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.grid{display:grid;gap:12px;}
+.grid2{grid-template-columns:1fr 1fr;}
+.grid3{grid-template-columns:1fr 1fr 1fr;}
+.grid4{grid-template-columns:1fr 1fr 1fr 1fr;}
+@media(max-width:760px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:7px 8px;border-bottom:1px solid var(--border);text-align:left;}
+th{color:var(--text3);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;}
+td{color:var(--text2);}
+td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--text);}
+.mono{font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.tier-1{background:rgba(52,211,153,.15);color:var(--green);}
+.tier-2{background:rgba(59,130,246,.15);color:#60a5fa;}
+.tier-3{background:var(--amber-bg);color:var(--amber);}
+.tier-4{background:var(--red-bg);color:var(--red);}
+.vbadge{color:var(--green);font-weight:700;}
+.vbadge-warn{color:var(--amber);font-weight:700;}
+.sg{background:var(--green-bg);color:var(--green);} .sa{background:var(--amber-bg);color:var(--amber);}
+.sr{background:var(--red-bg);color:var(--red);} .sb-sig{background:var(--cyan-bg);color:var(--cyan);}
+.sn{background:rgba(154,171,194,.12);color:var(--text2);}
+.sg,.sa,.sr,.sb-sig,.sn{display:inline-block;padding:3px 10px;border-radius:6px;font-weight:700;font-size:12px;}
+.trd-g{color:var(--green);} .trd-a{color:var(--amber);} .trd-r{color:var(--red);}
+.bmc-beat{background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:5px;font-size:11.5px;font-weight:700;}
+.bmc-miss{background:var(--red-bg);color:var(--red);padding:2px 7px;border-radius:5px;font-size:11.5px;font-weight:700;}
+.fv-mos-pos{color:var(--green);font-weight:700;} .fv-mos-neg{color:var(--red);font-weight:700;}
+.hz-active{background:rgba(34,211,238,.10);}
+.rf-ok{border-left:4px solid var(--green);background:var(--green-bg);border-radius:8px;padding:14px;}
+.rf-warn{border-left:4px solid var(--amber);background:var(--amber-bg);border-radius:8px;padding:14px;margin-bottom:10px;}
+.cb-high{border:1px solid rgba(52,211,153,.35);background:linear-gradient(135deg,rgba(52,211,153,.10),rgba(52,211,153,.02));}
+.cb-mod{border:1px solid rgba(251,191,36,.35);background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.02));}
+.cb-low{border:1px solid rgba(248,113,113,.35);background:linear-gradient(135deg,rgba(248,113,113,.10),rgba(248,113,113,.02));}
+.header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.price{font-size:34px;font-weight:800;color:var(--text);}
+.chg{font-size:14px;font-weight:700;}
+.badge-h{background:var(--cyan-bg);color:var(--cyan);border:1px solid var(--cyan-dim);padding:5px 14px;border-radius:20px;font-weight:700;font-size:13px;}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--border);margin-bottom:16px;padding-bottom:0;scrollbar-width:thin;}
+.tab-btn{background:transparent;border:none;color:var(--text3);padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.15s;}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.active{color:var(--cyan);border-bottom:2px solid var(--cyan);}
+.tabcontent{display:none;}
+.tabcontent.active{display:block;animation:fade .2s ease;}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:760px){.statgrid{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.stat .l{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+.stat .v{font-size:18px;font-weight:700;color:var(--text);}
+.rangebar{position:relative;height:8px;background:var(--border);border-radius:6px;margin:10px 0 6px;}
+.rangebar .fill{position:absolute;height:8px;border-radius:6px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));width:100%;opacity:.35;}
+.rangebar .cursor{position:absolute;top:-4px;width:3px;height:16px;background:var(--cyan);border-radius:2px;}
+.rangelabels{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text3);}
+.fvbar{position:relative;height:34px;border-radius:8px;margin:14px 0 8px;overflow:hidden;display:flex;}
+.fvz-u{background:rgba(248,113,113,.30);} .fvz-f{background:rgba(52,211,153,.30);} .fvz-p{background:rgba(251,191,36,.30);}
+.fvbar .cmpline{position:absolute;top:-6px;width:3px;height:46px;background:var(--cyan);}
+.fvbar .cmplabel{position:absolute;top:-26px;font-size:11px;color:var(--cyan);font-weight:700;white-space:nowrap;transform:translateX(-50%);}
+.collapse{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.collapse summary{padding:10px 14px;cursor:pointer;font-weight:700;color:var(--text);background:var(--card2);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+.collapse summary::after{content:'+';color:var(--cyan);font-size:16px;}
+.collapse[open] summary::after{content:'–';}
+.collapse .body{padding:12px 14px;background:var(--card);}
+.pillrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+.pill{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);}
+.barwrap{margin:10px 0;}
+.barlabel{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:3px;}
+.barouter{height:10px;background:var(--border);border-radius:6px;overflow:hidden;}
+.barinner{height:10px;border-radius:6px;}
+.footer-disclaimer{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-top:24px;font-size:12px;color:var(--text3);}
+.footer-disclaimer h4{margin-top:14px;}
+.footer-disclaimer h4:first-child{margin-top:0;}
+ul{margin:6px 0 10px;padding-left:20px;color:var(--text2);}
+li{margin-bottom:4px;}
+.flagcard{border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+.flag-watch{background:var(--amber-bg);border-left:4px solid var(--amber);}
+.flag-info{background:rgba(154,171,194,.08);border-left:4px solid var(--text3);}
+.kv{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border);font-size:12.5px;}
+.kv span:first-child{color:var(--text3);}
+.kv span:last-child{color:var(--text);font-weight:600;}
+.scorewrap{display:flex;align-items:center;gap:18px;}
+.ring{flex-shrink:0;}
+.note{font-size:11.5px;color:var(--text3);font-style:italic;}
+a{color:var(--cyan);text-decoration:none;}
+.divider{border-top:1px solid var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <div class="header">
+    <div>
+      <h1>Micron Technology, Inc. <span style="color:var(--text3);font-weight:500;">— NASDAQ: MU</span></h1>
+      <div class="headline">
+        <span class="price">$1,050.21</span>
+        <span class="chg trd-r">▼ 6.18% (recent session)</span>
+        <span class="badge-h">5-Year Horizon View</span>
+      </div>
+      <p style="margin-top:6px;">Semiconductors — Memory &amp; Storage (DRAM / NAND / HBM) · Boise, Idaho, USA</p>
+    </div>
+  </div>
+
+  <!-- Market Confidence Banner -->
+  <div class="card cb-high">
+    <div class="grid grid4">
+      <div><div class="l" style="color:var(--text3);font-size:11px;">EXCHANGE</div><div style="font-weight:700;">NASDAQ Global Select</div></div>
+      <div><div class="l" style="color:var(--text3);font-size:11px;">REPORTING CURRENCY</div><div style="font-weight:700;">$ USD</div></div>
+      <div><div class="l" style="color:var(--text3);font-size:11px;">DATA CONFIDENCE</div><div style="font-weight:700;color:var(--green);">🟢 HIGH (cap 10.0/10)</div></div>
+      <div><div class="l" style="color:var(--text3);font-size:11px;">PRIMARY SOURCES</div><div style="font-weight:700;">SEC EDGAR · Macrotrends · Yahoo Finance</div></div>
+    </div>
+    <div class="divider"></div>
+    <p style="margin:0;font-size:12.5px;"><b style="color:var(--text);">Known data gap:</b> Micron's 783%+ 52-week rally (AI memory supercycle) is causing real disagreement across data providers on trailing P/E, P/B and capex figures — this is a high-quality T1/T2 market, but treat point-in-time valuation multiples as indicative. Cross-verify CMP and live multiples from your own broker terminal before acting. Report generated June 18, 2026.</p>
+  </div>
+
+  <!-- ============ TABS ============ -->
+  <div class="tabs" id="tabbar">
+    <button class="tab-btn" data-t="t1">📊 Snapshot</button>
+    <button class="tab-btn" data-t="t2">💰 Valuation</button>
+    <button class="tab-btn" data-t="t3">📈 Growth</button>
+    <button class="tab-btn" data-t="t4">🏦 Health</button>
+    <button class="tab-btn" data-t="t5">🏛 Management</button>
+    <button class="tab-btn" data-t="t6">🔮 Outlook</button>
+    <button class="tab-btn active" data-t="t7">★ View</button>
+    <button class="tab-btn" data-t="t8">📰 News</button>
+    <button class="tab-btn" data-t="t9">🧮 Assumptions</button>
+  </div>
+
+  <!-- ============ TAB 1: SNAPSHOT ============ -->
+  <div class="tabcontent" id="t1">
+    <div class="card">
+      <h2>Price Snapshot</h2>
+      <div class="statgrid">
+        <div class="stat"><div class="l">CMP</div><div class="v">$1,050.21</div></div>
+        <div class="stat"><div class="l">Market Cap</div><div class="v">~$1.16T</div></div>
+        <div class="stat"><div class="l">52W High</div><div class="v">$1,110.40</div></div>
+        <div class="stat"><div class="l">52W Low</div><div class="v">$103.38</div></div>
+        <div class="stat"><div class="l">Shares O/S</div><div class="v">1.122B</div></div>
+        <div class="stat"><div class="l">Face Value</div><div class="v">$0.10</div></div>
+        <div class="stat"><div class="l">Beta (5Y monthly)</div><div class="v">2.17</div></div>
+        <div class="stat"><div class="l">52W Return</div><div class="v" style="color:var(--green);">+783% to +900%</div></div>
+      </div>
+      <div class="rangebar"><div class="fill"></div><div class="cursor" style="left:91.7%;"></div></div>
+      <div class="rangelabels"><span>$103.38</span><span>52-Week Range</span><span>$1,110.40</span></div>
+      <p class="note">Cursor position = (CMP − 52W Low) ÷ (52W High − 52W Low) × 100 ≈ 92% — trading near the top of its 52-week range.</p>
+    </div>
+
+    <div class="card">
+      <h3>Company Snapshot</h3>
+      <p>Micron designs, manufactures and sells DRAM, NAND and NOR memory and storage products under the Micron and Crucial brands, serving data center, mobile, client/PC, graphics, automotive, industrial and consumer end-markets. Operates through Cloud Memory (CMBU), Core Data Center (CDBU), Mobile &amp; Client (MCBU) and Automotive &amp; Embedded (AEBU) business units. Founded 1978; HQ Boise, Idaho. Fabs in the US, Taiwan, Japan, Singapore, Malaysia, China and India.</p>
+      <div class="pillrow">
+        <span class="pill">FY2025 Revenue: $37.38B</span>
+        <span class="pill">FY2025 Net Income: $8.54B</span>
+        <span class="pill">TTM Revenue: $58.12B</span>
+        <span class="pill">Employees: ~50,000+</span>
+        <span class="pill">CEO: Sanjay Mehrotra</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Why This Stock Is In The News (June 2026)</h3>
+      <ul>
+        <li>Crossed $1 trillion market cap in 2026 on AI-driven DRAM/HBM demand; HBM production fully sold out through calendar 2026.</li>
+        <li>Q2 FY2026: revenue $23.86B (+196% YoY), EPS $12.20 vs. $8.60 consensus — a 41.9% beat.</li>
+        <li>FY2026 capex guidance raised twice: $18B → $20B → ~$25B, the largest capital intensity step-up in company history.</li>
+        <li>Q3 FY2026 earnings due June 24, 2026 — consensus expects record revenue (~$33.5-34.9B) and EPS ~$19.6-20.3.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ TAB 2: VALUATION ============ -->
+  <div class="tabcontent" id="t2">
+    <div class="card">
+      <h2>Valuation Multiples</h2>
+      <p>Valuation assessed for a <b style="color:var(--cyan);">5-year investor</b> — H=5 tolerance: max +20% P/E premium to sector fair · PEG &lt; 1.5 = FAIR.</p>
+      <table>
+        <tr><th>Multiple</th><th>Current</th><th>Sector Avg (Semis)</th><th>Read</th></tr>
+        <tr><td>P/E (TTM)</td><td class="num">~48-49×</td><td class="num">n/a (distorted by cyclical low base)</td><td><span class="sa">RICH (trailing)</span></td></tr>
+        <tr><td>P/E (Forward, consensus)</td><td class="num">~10-16×</td><td class="num">36.0×</td><td><span class="sg">CHEAP vs sector</span></td></tr>
+        <tr><td>P/B (current)</td><td class="num">16.93×</td><td class="num">—</td><td><span class="sa">ELEVATED</span></td></tr>
+        <tr><td>EV/EBITDA</td><td class="num">~31-33×</td><td class="num">—</td><td><span class="sa">ELEVATED</span></td></tr>
+        <tr><td>PEG (5Y fwd, consensus)</td><td class="num">0.37</td><td class="num">1.0 (fair)</td><td><span class="sg">CHEAP</span></td></tr>
+      </table>
+      <p class="note">Trailing P/E is heavily distorted because TTM EPS still includes weak quarters from the FY2023-24 memory downcycle while the AI-driven earnings inflection is recent. Forward-looking multiples (Forward P/E, PEG) are more representative of the current earnings power and are weighted more heavily in this verdict.</p>
+    </div>
+
+    <div class="card">
+      <h2>Fair Value Range &amp; Margin of Safety</h2>
+      <div class="kv"><span>Forward EPS (FY2026E consensus)</span><span>$58.05</span></div>
+      <div class="kv"><span>Bear FV = Forward EPS × 8.0× (trough memory multiple)</span><span>$464.40</span></div>
+      <div class="kv"><span>Base FV = Forward EPS × 12.0× (current forward-PE zone)</span><span>$696.60</span></div>
+      <div class="kv"><span>Bull FV = Forward EPS × 18.0× (structural re-rating, still &lt; sector avg)</span><span>$1,044.90</span></div>
+      <div class="kv"><span>MOS = (Base FV − CMP) ÷ Base FV</span><span class="fv-mos-neg">−50.7%</span></div>
+
+      <div class="fvbar">
+        <div class="fvz-u" style="width:39%;"></div>
+        <div class="fvz-f" style="width:31%;"></div>
+        <div class="fvz-p" style="width:30%;"></div>
+        <div class="cmpline" style="left:84%;"></div>
+        <div class="cmplabel" style="left:84%;">CMP $1,050</div>
+      </div>
+      <div class="rangelabels"><span>$394.7 (range start)</span><span>Bear→Base "Fair Zone"→Bull</span><span>$1,201.6 (range end)</span></div>
+
+      <div class="divider"></div>
+      <div class="kv"><span>MOS Threshold (H=5)</span><span>15%+ Strong Buy · 8-15% Accumulate · 0-8% Hold · Negative → Avoid</span></div>
+      <div class="kv"><span>Entry Zone Label (H=5)</span><span class="sa">EXPENSIVE</span></div>
+      <p class="note">At −50.7% MOS to Base FV, the stock is pricing in a scenario meaningfully above this report's Base Case — closer to, or beyond, the Bull Case. This is consistent with both bull (TD Cowen: CY2027 EPS ~$150, target $1,500) and bear (GuruFocus GF Value $381, "Significantly Overvalued") camps being simultaneously active in the market right now.</p>
+    </div>
+
+    <div class="card">
+      <h2>Horizon Target Price Table</h2>
+      <p class="note">Bear/Base/Bull EPS CAGR = Base Case CAGR × 0.50 / 0.85 / 1.15. Terminal P/E: Bear 8×, Base 12×, Bull 18× (see Assumptions tab for why Base Case CAGR is a normalized substitute, not raw 5Y EPS CAGR).</p>
+      <table>
+        <tr><th>Horizon</th><th>Bear</th><th>Base</th><th>Bull</th><th>Implied CAGR from CMP (Base)</th></tr>
+        <tr><td>3-Year</td><td class="num">$687.80</td><td class="num">$1,460.40</td><td class="num">$2,416.00</td><td class="num">11.7%</td></tr>
+        <tr class="hz-active"><td><b>5-Year (your horizon)</b></td><td class="num">$893.60</td><td class="num">$2,393.00</td><td class="num">$4,224.00</td><td class="num">17.9%</td></tr>
+        <tr><td>10-Year</td><td class="num">$1,721.00</td><td class="num">$8,224.00</td><td class="num">$17,076.00</td><td class="num">22.8%</td></tr>
+      </table>
+      <p class="note">⚠ 10-year mechanical compounding is shown for completeness per the standard framework, but should be treated with extreme caution — memory is a boom/bust cyclical industry, and no company has sustained 20%+ EPS CAGR through multiple full cycles for a decade. Treat the 10Y row as illustrative ceiling/floor bracketing, not a forecast.</p>
+    </div>
+  </div>
+
+  <!-- ============ TAB 3: GROWTH ============ -->
+  <div class="tabcontent" id="t3">
+    <div class="card">
+      <h2>Revenue &amp; Earnings History</h2>
+      <table>
+        <tr><th>Fiscal Year</th><th>Revenue</th><th>YoY</th><th>Net Income</th><th>Gross Margin</th></tr>
+        <tr><td>FY2022</td><td class="num">$30.80B</td><td class="num">—</td><td class="num">~$5.86B*</td><td class="num">~45%*</td></tr>
+        <tr><td>FY2023</td><td class="num">$15.54B</td><td class="num trd-r">−49.5%</td><td class="num">−$5.83B</td><td class="num trd-r">−9.1%</td></tr>
+        <tr><td>FY2024</td><td class="num">$25.11B</td><td class="num trd-g">+61.6%</td><td class="num">$0.78B</td><td class="num">22.4%</td></tr>
+        <tr><td>FY2025</td><td class="num">$37.38B</td><td class="num trd-g">+48.9%</td><td class="num">$8.54B</td><td class="num">39.8%</td></tr>
+        <tr><td>TTM (Feb 2026)</td><td class="num">$58.12B</td><td class="num trd-g">+85.6%</td><td class="num">$24.11B</td><td class="num">—</td></tr>
+      </table>
+      <p class="note">*FY2022 figures are reasonable estimates triangulated from prior-year decline percentages disclosed by data aggregators; flagged ⚠ for independent verification.</p>
+      <div class="kv"><span>Revenue 3Y CAGR (T3 source)</span><span>114.98%/yr</span></div>
+      <div class="kv"><span>Revenue 5Y CAGR (T3 source)</span><span>19.85%/yr</span></div>
+      <div class="kv"><span>Growth Classification</span><span class="sg">ACCELERATING (3Y CAGR ≫ 5Y CAGR + margins expanding sharply)</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Earnings Beat/Miss Track Record (consensus)</h2>
+      <table>
+        <tr><th>Period</th><th>Actual EPS</th><th>Consensus</th><th>Result</th></tr>
+        <tr><td>Q2 FY2026</td><td class="num">$12.20</td><td class="num">$8.60-$9.31</td><td><span class="bmc-beat">BEAT +32-42%</span></td></tr>
+        <tr><td>Q1 FY2026</td><td class="num">$4.78</td><td class="num">$3.91</td><td><span class="bmc-beat">BEAT +22.3%</span></td></tr>
+        <tr><td>Q4 FY2025</td><td class="num">$3.03</td><td class="num">$2.86</td><td><span class="bmc-beat">BEAT +5.9%</span></td></tr>
+        <tr><td>Prior quarters (5 more)</td><td class="num">—</td><td class="num">—</td><td><span class="bmc-beat">BEAT (8 consecutive quarters total)</span></td></tr>
+      </table>
+      <div class="kv"><span>Predictability Classification</span><span class="sg">HIGHLY PREDICTABLE (8 of 8 beats)</span></div>
+      <p class="note">Source: Benzinga / Zacks (T3) — exact figures for quarters 4-8 not individually itemized in search results but the "8 consecutive beats" streak is independently corroborated by two sources.</p>
+    </div>
+
+    <div class="card">
+      <h2>Forward Projections (H=5, illustrative — see Assumptions tab)</h2>
+      <table>
+        <tr><th>Scenario</th><th>Rev CAGR used</th><th>Margin assumption</th><th>FY+5 Revenue</th></tr>
+        <tr><td>Bear</td><td class="num">9.9% (5Y CAGR × 0.50)</td><td class="num">5Y worst (−9.1%, FY23)</td><td class="num">$59.9B</td></tr>
+        <tr><td>Base</td><td class="num">16.9% (5Y CAGR × 0.85)</td><td class="num">3Y avg (~17.7%)</td><td class="num">$81.9B</td></tr>
+        <tr><td>Bull</td><td class="num">22.8% (5Y CAGR × 1.15)</td><td class="num">5Y best (39.8%, FY25)</td><td class="num">$103.5B</td></tr>
+      </table>
+      <div class="barwrap"><div class="barlabel"><span>Bear</span><span>58%</span></div><div class="barouter"><div class="barinner" style="width:58%;background:var(--red);"></div></div></div>
+      <div class="barwrap"><div class="barlabel"><span>Base</span><span>79%</span></div><div class="barouter"><div class="barinner" style="width:79%;background:var(--amber);"></div></div></div>
+      <div class="barwrap"><div class="barlabel"><span>Bull</span><span>100%</span></div><div class="barouter"><div class="barinner" style="width:100%;background:var(--green);"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 4: HEALTH ============ -->
+  <div class="tabcontent" id="t4">
+    <div class="card">
+      <h2>Financial Health Scorecard</h2>
+      <div class="grid grid3">
+        <div class="card2"><div class="l" style="color:var(--text3);">D/E (current)</div><div style="font-size:20px;font-weight:700;">0.13-0.15×</div><span class="sg">SAFE</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Current Ratio</div><div style="font-size:20px;font-weight:700;">2.90×</div><span class="sg">COMFORTABLE</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Interest Coverage</div><div style="font-size:20px;font-weight:700;">Est. &gt;10×</div><span class="sg">HEALTHY ⚠ estimated</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">FCF (TTM)</div><div style="font-size:20px;font-weight:700;">$10.28B</div><span class="sg">STRONG</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">OCF/NP (TTM)</div><div style="font-size:20px;font-weight:700;">1.27×</div><span class="sg">GENUINE</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Net Cash Position</div><div style="font-size:20px;font-weight:700;">$5.83B</div><span class="sg">NET CASH</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>5-Year Working Capital Trend</h2>
+      <table>
+        <tr><th>Fiscal Year</th><th>DSO (days)</th><th>DIO (days)</th><th>DPO (days)</th><th>CCC (days)</th><th>Trend</th></tr>
+        <tr><td>FY2022</td><td class="num">60.8</td><td class="num">143.6</td><td class="num">131.2</td><td class="num">73.2</td><td>—</td></tr>
+        <tr><td>FY2023</td><td class="num">57.4</td><td class="num">180.5</td><td class="num">85.2</td><td class="num">152.7</td><td class="trd-r">↑ worsening (downcycle inventory glut)</td></tr>
+        <tr><td>FY2024</td><td class="num">96.2</td><td class="num">166.1</td><td class="num">136.6</td><td class="num">125.7</td><td class="trd-g">↓ improving</td></tr>
+        <tr><td>FY2025</td><td class="num">90.5</td><td class="num">135.5</td><td class="num">142.8 ⚠</td><td class="num">83.2 ⚠</td><td class="trd-g">↓ improving further</td></tr>
+      </table>
+      <p class="note">Formulas: DSO=(Receivables÷Revenue)×365 · DIO=(Inventory÷COGS)×365 · DPO=(Payables÷COGS)×365 · CCC=DSO+DIO−DPO. Source: SEC 10-K filings (T1) for FY22-24; FY2025 accounts-payable figure is a ⚠ estimate (not directly confirmed in search results — recompute from the FY2025 10-K balance sheet before relying on it). <b>No red flag triggered</b>: CCC worsened sharply in the FY2023 downcycle but has improved for two consecutive years since — does not meet the H=5 "worsening in both of last 2 years" threshold.</p>
+    </div>
+
+    <div class="card">
+      <h2>Returns &amp; Capital Allocation</h2>
+      <div class="grid grid3">
+        <div class="card2"><div class="l" style="color:var(--text3);">ROE (TTM)</div><div style="font-size:20px;font-weight:700;">39.82%</div><span class="sg">GOOD</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">ROIC (TTM)</div><div style="font-size:20px;font-weight:700;">37.4-37.7%</div><span class="sg">GOOD</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Est. WACC</div><div style="font-size:20px;font-weight:700;">19.29%</div><span class="sn">Reference</span></div>
+      </div>
+      <div class="divider"></div>
+      <table>
+        <tr><th>Check</th><th>Assessment</th><th>Verdict</th></tr>
+        <tr><td>1. ROIC vs WACC</td><td>37.4% vs 19.29% → ratio 1.94× (just under the 2× "excellent" bar)</td><td><span class="sa">~</span></td></tr>
+        <tr><td>2. Cash return to shareholders</td><td>Dividend raised 30% (to $0.15/qtr) but buybacks paused in FY2025 to fund capex ramp</td><td><span class="sa">~</span></td></tr>
+        <tr><td>3. Capex discipline</td><td>FY26 capex guided +81% vs FY25 actual; revenue (TTM) growing +85.6% YoY — roughly in line, not runaway</td><td><span class="sa">~</span></td></tr>
+      </table>
+      <div class="kv"><span>Capital Allocation Score</span><span class="sa">~2/3 — GOOD</span></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB 5: MANAGEMENT ============ -->
+  <div class="tabcontent" id="t5">
+    <div class="card">
+      <h2>Ownership Structure</h2>
+      <div class="grid grid3">
+        <div class="card2"><div class="l" style="color:var(--text3);">Institutional Ownership</div><div style="font-size:20px;font-weight:700;">~74-81%</div><span class="sg">INCREASING (Q1 2026: +2,440 new positions)</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Insider Ownership</div><div style="font-size:20px;font-weight:700;">~0.3-1.6%</div><span class="sn">Typical for mega-cap</span></div>
+        <div class="card2"><div class="l" style="color:var(--text3);">Largest Holder</div><div style="font-size:16px;font-weight:700;">BlackRock — 9.15%</div><span class="sn">Passive/Index-driven</span></div>
+      </div>
+      <p class="note">Recent insider activity: CFO Mark Murphy sold 35,000 shares in the trailing 90-day window — routine, not a systematic distress-selling pattern. Insider ownership declined ~3.7% over the same window off an already-tiny base. <b>No "net insider selling &gt;20% of holdings" flag triggered.</b></p>
+    </div>
+
+    <div class="card">
+      <h2>Management Accountability — Guidance vs. Actual</h2>
+      <table>
+        <tr><th>Quarter</th><th>Guided</th><th>Actual</th><th>Result</th></tr>
+        <tr><td>Q2 FY2026</td><td class="num">Rev $18.70B ±0.4B / EPS $8.19 ±0.20</td><td class="num">Rev $23.86B / EPS $12.20</td><td><span class="bmc-beat">BEAT (well above high end)</span></td></tr>
+        <tr><td>Q1 FY2026</td><td class="num">Rev ~$13.0B (consensus)</td><td class="num">Rev $13.6B</td><td><span class="bmc-beat">BEAT</span></td></tr>
+        <tr><td>Q3 FY2026 (pending, reports Jun 24)</td><td class="num">Rev $33.5B ±0.75B / EPS $18.90 ±0.40</td><td class="num">— pending —</td><td><span class="sn">TBD</span></td></tr>
+      </table>
+      <div class="kv"><span>Accountability Score</span><span class="sg">4/4 recent quarters beaten — HIGHLY RELIABLE</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Governance</h2>
+      <ul>
+        <li><b>Auditor:</b> PricewaterhouseCoopers LLP — ratified for FY2026, no qualification or going-concern paragraph disclosed.</li>
+        <li><b>Board independence:</b> ~9 of 10 directors independent under Nasdaq rules; Lead Independent Director structure alongside combined Chairman/CEO (Sanjay Mehrotra).</li>
+        <li><b>Board diversity:</b> Multiple women directors including Audit Committee chair (former KPMG partner) and a former Deloitte semiconductor-practice leader.</li>
+        <li><b>Related-party transactions:</b> None flagged as material (&gt;5% of revenue) in available filings.</li>
+        <li><b>Revenue concentration:</b> Over 50% of FY2025 revenue from top 10 customers; ~50% of revenue concentrated in the data center end-market — disclosed risk factor, discussed in Red Flags (View ★ tab).</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ TAB 6: OUTLOOK ============ -->
+  <div class="tabcontent" id="t6">
+    <div class="card">
+      <h2>Moat Assessment — Market Share Trajectory (H=5 lens)</h2>
+      <div class="kv"><span>Rating</span><span class="sa">HOLDING (mixed — losing DRAM share to Samsung, gaining in HBM)</span></div>
+      <ul>
+        <li>Global DRAM share (Q1 2026): Samsung 38.6% (↑2.1pp QoQ) · SK Hynix 28.8% (↓4.1pp) · Micron 22.4% (↓0.4pp) — Micron is #3 and the gap to #1 is widening.</li>
+        <li>In HBM specifically, Micron is "expanding aggressively" per TrendForce and has its entire 2026 HBM output sold out — a structurally improving sub-segment even as overall DRAM share erodes slightly.</li>
+        <li>Revenue growth (TTM +85.6%) is outpacing Micron's own historical 5Y CAGR (19.85%) by a wide margin, driven by pricing (ASP) gains, not share gains.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Macro Economics Impact (4-Layer)</h2>
+      <details class="collapse" open><summary>Layer 1 — Global Macro</summary><div class="body">
+        <p>Fed funds rate steady at 3.50-3.75% (June 2026 FOMC, new Chair Kevin Warsh), inflation running ~4.2% — a moderately restrictive but stable backdrop. USD strength matters for Micron's ~67% non-US-shipped revenue. Global AI capex (hyperscaler data center buildouts) is the dominant demand driver, not broad GDP.</p>
+        <div class="kv"><span>Impact on MU</span><span class="sg">POSITIVE (AI capex cycle dominates over rate cycle)</span></div>
+      </div></details>
+      <details class="collapse"><summary>Layer 2 — Country Macro (USA)</summary><div class="body">
+        <p>CHIPS Act direct funding (up to $6.4B) materially subsidizes Micron's Idaho/New York fab buildout. US-China trade friction and export controls on semiconductor equipment create two-sided exposure: protects US fabs but complicates supply chains and China-market access.</p>
+        <div class="kv"><span>Impact on MU</span><span class="sn">NEUTRAL-TO-POSITIVE (subsidy tailwind vs. trade-friction headwind)</span></div>
+      </div></details>
+      <details class="collapse"><summary>Layer 3 — Sector-Specific Macro</summary><div class="body">
+        <p>DRAM/NAND industry inventory at historically low levels (2-3 weeks DRAM, 3-4 weeks NAND per industry trackers); WSTS forecasts memory segment growth of ~30-39% in 2026; BofA calls it a "supercycle similar to the 1990s boom." Wafer-fab equipment export controls into China are a live policy risk for the whole industry's capacity plans.</p>
+        <div class="kv"><span>Impact on MU</span><span class="sg">POSITIVE (tight supply = pricing power)</span></div>
+      </div></details>
+      <details class="collapse"><summary>Layer 4 — Stock-Specific Sensitivity</summary><div class="body">
+        <p><b>Most critical factor:</b> DRAM/HBM average selling prices (ASPs) — these, not unit volumes, are driving the current earnings inflection.</p>
+        <p><b>Best case:</b> AI infrastructure spend keeps accelerating, HBM4 ramps smoothly, Micron narrows the share gap to Samsung/SK Hynix.<br><b>Worst case:</b> Hyperscaler capex digestion pause + new DRAM/NAND capacity from competitors arrives simultaneously → classic memory down-cycle repeats (as in FY2023).</p>
+        <div class="kv"><span>Current Assessment</span><span class="sg">TAILWIND</span></div>
+        <div class="kv"><span>Confidence</span><span class="sa">MODERATE (cyclical industry, limited multi-cycle visibility)</span></div>
+      </div></details>
+    </div>
+
+    <div class="card">
+      <h2>Future Growth Catalysts (H=5 → Near + Medium term highlighted)</h2>
+      <details class="collapse" open><summary>Near-Term (0-18 months)</summary><div class="body">
+        <table>
+          <tr><th>Catalyst</th><th>Timeline</th><th>Impact</th><th>Confidence</th></tr>
+          <tr><td>Q3 FY2026 earnings (record revenue expected)</td><td>Jun 24, 2026</td><td>High</td><td><span class="sg">HIGH CONVICTION</span></td></tr>
+          <tr><td>HBM4 mainstream transition</td><td>H2 2026</td><td>High (pricing premium &gt;30%)</td><td><span class="sa">MODERATE</span></td></tr>
+          <tr><td>First 5-year Strategic Customer Agreement signed</td><td>Announced Mar 2026</td><td>Demand visibility</td><td><span class="sg">HIGH CONVICTION</span></td></tr>
+        </table>
+      </div></details>
+      <details class="collapse" open><summary>Medium-Term (2-4 years)</summary><div class="body">
+        <table>
+          <tr><th>Catalyst</th><th>Timeline</th><th>Impact</th><th>Confidence</th></tr>
+          <tr><td>Idaho Fab 1 first DRAM output</td><td>Mid-CY2027</td><td>Bit-supply growth</td><td><span class="sg">HIGH CONVICTION</span></td></tr>
+          <tr><td>$1.8B PSMC fab acquisition ramps DRAM production</td><td>H2 2027</td><td>Incremental capacity</td><td><span class="sa">MODERATE</span></td></tr>
+          <tr><td>Idaho Fab 2 construction begins / operational</td><td>2026 start / end-2028</td><td>Long-run supply</td><td><span class="sa">MODERATE</span></td></tr>
+          <tr><td>India assembly ramp</td><td>2026</td><td>Cost/geographic diversification</td><td><span class="sa">MODERATE</span></td></tr>
+        </table>
+      </div></details>
+      <details class="collapse"><summary>Long-Term (5+ years)</summary><div class="body">
+        <table>
+          <tr><th>Catalyst</th><th>Timeline</th><th>Impact</th><th>Confidence</th></tr>
+          <tr><td>New York mega-fab (up to 4 fabs, $100B project)</td><td>First output 2030+</td><td>Multi-decade capacity base</td><td><span class="sn">SPECULATIVE</span></td></tr>
+          <tr><td>Secular AI/data-driven memory-intensity growth</td><td>Structural, 2026-2035+</td><td>TAM expansion</td><td><span class="sa">MODERATE</span></td></tr>
+        </table>
+      </div></details>
+      <p class="note">Catalyst count: 3 near-term · 4 medium-term · 2 long-term identified.</p>
+    </div>
+
+    <div class="card">
+      <h2>Industry Deep Dive — DRAM/NAND Memory</h2>
+      <details class="collapse"><summary>1. Industry Definition</summary><div class="body"><p>Semiconductor memory — DRAM (volatile, working memory) and NAND flash (non-volatile, storage), plus the fast-growing HBM (high-bandwidth memory) sub-category used in AI accelerators. GICS: Semiconductors &amp; Semiconductor Equipment.</p></div></details>
+      <details class="collapse" open><summary>2. Market Size &amp; Growth</summary><div class="body">
+        <ul>
+          <li>Global memory market: ~$203B (2026E) → ~$403B by 2033 (CAGR ~10.3%), per Persistence Market Research.</li>
+          <li>WSTS: total semiconductor market ~$975B in 2026 (+26.3% YoY); memory segment ~$295B (+39.4% YoY).</li>
+          <li>BofA "supercycle" view: 2026 DRAM revenue +51% YoY, NAND +45% YoY; HBM market alone ~$54.6B in 2026 (+58%).</li>
+        </ul>
+      </div></details>
+      <details class="collapse" open><summary>3. Industry Structure</summary><div class="body"><p><b>Oligopoly.</b> DRAM: Samsung, SK Hynix and Micron together hold &gt;90% share. NAND adds Kioxia and Western Digital/SanDisk to the top tier. <b>Barriers to entry: VERY HIGH</b> — multi-billion-dollar fabs, multi-year qualification cycles, deep IP/process know-how.</p></div></details>
+      <details class="collapse"><summary>4. Value Chain Position</summary><div class="body"><p>Integrated Device Manufacturer (IDM) — Micron designs and fabricates in-house. Pricing power: currently <b>STRONG</b> (supply-constrained upcycle) but historically swings to WEAK in downcycles. Customer switching costs: MODERATE (qualification cycles create some stickiness, but commodity DRAM/NAND remain price-competitive).</p></div></details>
+      <details class="collapse" open><summary>5. Porter's Five Forces</summary><div class="body">
+        <ul>
+          <li>Threat of new entrants: <b>LOW</b> — capex and technology barriers are prohibitive.</li>
+          <li>Bargaining power of suppliers (equipment — ASML, Lam Research, etc.): <b>MEDIUM-HIGH</b> — EUV tool scarcity, export-control friction.</li>
+          <li>Bargaining power of buyers (hyperscalers, OEMs): <b>MEDIUM-HIGH</b> — top-10 customers are >50% of revenue, multi-year LTAs cut both ways.</li>
+          <li>Threat of substitutes: <b>LOW</b> — no near-term substitute for DRAM/NAND/HBM in compute architectures.</li>
+          <li>Competitive rivalry: <b>HIGH</b> — three-way oligopoly battles for share even within a supply-constrained market.</li>
+        </ul>
+        <div class="kv"><span>Overall Industry Attractiveness</span><span class="sg">ATTRACTIVE (cyclically, currently very attractive)</span></div>
+      </div></details>
+      <details class="collapse"><summary>6. Key Industry Trends</summary><div class="body"><ul><li>HBM4 transition doubling I/O count, commanding &gt;30% pricing premium.</li><li>Structural shift of DRAM demand mix toward data-center/server vs. consumer/mobile.</li><li>Three-way race for advanced node leadership (1-gamma DRAM, 200+ layer NAND).</li></ul></div></details>
+      <details class="collapse"><summary>7. Regulatory Environment</summary><div class="body"><p>US CHIPS Act subsidies (tailwind); evolving US export controls on semiconductor equipment/tools to China (headwind/uncertainty); China's Cyberspace Administration scrutiny of US memory chips in China (flagged risk factor in 10-Q). <b>Regulatory risk: MODERATE-HIGH</b> and a genuine two-sided factor — a moat in the US, a threat in China.</p></div></details>
+      <details class="collapse"><summary>8. Company's Positioning</summary><div class="body"><p>Rank #3 globally in DRAM (22.4% share), top-tier in HBM execution, sold-out 2026 HBM capacity. Competitive advantage vs industry: <b>ABOVE AVERAGE</b> — strong execution and margin recovery, but trailing the two Korean leaders in scale and (per recent quarters) profitability growth rate.</p></div></details>
+    </div>
+
+    <div class="card">
+      <h2>Peer Comparison</h2>
+      <table>
+        <tr><th>Company</th><th>Fwd P/E</th><th>DRAM/Memory Share</th><th>Rev Growth (recent)</th><th>Position</th></tr>
+        <tr><td><b>Micron (MU)</b></td><td class="num">~10-16×</td><td class="num">22.4% (DRAM)</td><td class="num">+85.6% (TTM)</td><td><span class="sa">LAGGING in share, strong in growth</span></td></tr>
+        <tr><td>SK Hynix (KOSE:A000660)</td><td class="num">7.4×</td><td class="num">28.8% (DRAM); HBM leader</td><td class="num">Record FY25 operating profit, beat Samsung for first time</td><td><span class="sg">LEADING (HBM)</span></td></tr>
+        <tr><td>Samsung Electronics</td><td class="num">n/a (diversified conglomerate)</td><td class="num">38.6% (DRAM) — #1</td><td class="num">DRAM revenue +95.4% YoY</td><td><span class="sg">LEADING (DRAM)</span></td></tr>
+        <tr><td>Western Digital (WDC)</td><td class="num">n/a</td><td class="num">Storage/HDD-adjacent, not direct DRAM peer</td><td class="num">+45% YoY (Q3 FY26)</td><td><span class="sn">ADJACENT PEER</span></td></tr>
+      </table>
+      <p class="note">Direct apples-to-apples P/E, P/B, ROE comparison is limited because Samsung is a diversified conglomerate (not pure-play memory) and SK Hynix trades in Korean won on KOSE. Micron's forward P/E (10-16×) is notably cheaper than the US semiconductor sector median (36×) but roughly in line with or slightly above SK Hynix's 7.4×, reflecting the market's view that Korean peers currently have superior HBM execution.</p>
+    </div>
+  </div>
+
+  <!-- ============ TAB 7: VIEW ★ (default) ============ -->
+  <div class="tabcontent active" id="t7">
+    <div class="card">
+      <h2>Overall Verdict — 5-Year Strategic View</h2>
+      <p style="color:var(--text);font-size:15px;">"Micron's medium-term compounding story is <b style="color:var(--amber);">strong but expensively priced</b>. The AI-driven memory supercycle has structurally repriced earnings power — forward multiples (10-16× P/E, 0.37 PEG) look genuinely cheap relative to the semiconductor sector. But the stock has already moved 783%+ in 52 weeks, trailing multiples are stretched, and memory remains a brutally cyclical industry that has wiped out similar rallies before (FY2023 swung to a $5.8B loss). The key risk to monitor over a 5-year horizon is whether the current AI capex super-cycle proves structural or whether a familiar DRAM/NAND boom-bust repeats once new global capacity (Samsung, SK Hynix, and Micron's own $25B FY26 capex) comes fully online around 2027-2028."</p>
+    </div>
+
+    <div class="card">
+      <h2>How We Weighted Signals For Your 5-Year Horizon</h2>
+      <table>
+        <tr><th>Signal</th><th>Raw Score</th><th>H=5 Weight</th><th>Weighted</th></tr>
+        <tr><td>Valuation</td><td class="num">2/5</td><td class="num">×1.5</td><td class="num">3.0</td></tr>
+        <tr><td>Earnings Consistency</td><td class="num">5/5</td><td class="num">×2.0</td><td class="num">10.0</td></tr>
+        <tr><td>Growth Trajectory</td><td class="num">5/5</td><td class="num">×2.0</td><td class="num">10.0</td></tr>
+        <tr><td>Financial Health</td><td class="num">4/5</td><td class="num">×2.0</td><td class="num">8.0</td></tr>
+        <tr><td>Capital Allocation</td><td class="num">3/5</td><td class="num">×2.0</td><td class="num">6.0</td></tr>
+        <tr><td>Moat / Sector Outlook</td><td class="num">3/5</td><td class="num">×1.0</td><td class="num">3.0</td></tr>
+        <tr style="border-top:2px solid var(--border);"><td><b>TOTAL</b></td><td></td><td></td><td class="num"><b>40.0 / 55 max → <span class="sb-sig">MODERATE-STRONG</span></b></td></tr>
+      </table>
+      <p class="note">For a 5-year holder, growth trajectory and capital allocation matter more than today's entry multiple — but valuation still carries real weight (×1.5) because Micron has already priced in much of the next several years of the bull case.</p>
+    </div>
+
+    <div class="grid grid3">
+      <div class="card2"><h4>3 Strengths</h4><ul style="padding-left:18px;"><li>8-for-8 consecutive earnings beats with management consistently under-guiding the AI ramp</li><li>Best-in-class balance sheet (D/E 0.13-0.15×, net cash positive, 2.9× current ratio)</li><li>CHIPS Act-subsidized US capacity build (Idaho/NY) reduces geopolitical single-point-of-failure risk vs. Asia-only peers</li></ul></div>
+      <div class="card2"><h4>2 Risks</h4><ul style="padding-left:18px;"><li>Trailing multiples are stretched (P/B 16.9×, EV/EBITDA ~32×) after a 783%+ rally — high expectations are now baked in</li><li>Classic memory-cycle risk: $25B FY26 capex (Micron's own) plus aggressive Samsung/SK Hynix expansion could create 2027-28 oversupply</li></ul></div>
+      <div class="card2"><h4>1 Thing To Track</h4><p style="margin:0;">DRAM/HBM average selling price (ASP) trends and inventory-weeks data each quarter — this is the single best leading indicator of where Micron sits in the cycle.</p></div>
+    </div>
+
+    <div class="card rf-ok">
+      <h2 style="color:var(--green);margin-bottom:6px;">✅ No CRITICAL red flags detected for your 5-year horizon</h2>
+      <p style="margin:0;color:var(--text2);">Two WATCH-level items below are worth monitoring but do not rise to critical severity at H=5.</p>
+    </div>
+
+    <div class="flagcard flag-watch">
+      <b style="color:var(--amber);">🟡 WATCH — Customer / End-Market Concentration</b>
+      <p style="margin:6px 0 4px;color:var(--text2);"><b>Why it matters:</b> Over 50% of FY2025 revenue came from the top 10 customers, and ~50% from the data-center end-market alone. A pullback by even one or two hyperscaler customers (or a slowdown in AI data-center capex) could disproportionately hit revenue.</p>
+      <p style="margin:0 0 4px;color:var(--text2);"><b>Threshold:</b> Company-disclosed risk factor (SEC 10-K) — no single customer named at &gt;25%, but aggregate top-10 concentration &gt;50% is high for a commodity-adjacent business.</p>
+      <p style="margin:0;color:var(--text2);"><b>For your 5-year horizon:</b> Meaningful but not disqualifying — data-center/AI demand concentration is an industry-wide feature right now, not unique mismanagement. Worth re-checking each year as customer mix data is refreshed.</p>
+    </div>
+
+    <div class="flagcard flag-watch">
+      <b style="color:var(--amber);">🟡 WATCH — Elevated Capital Intensity</b>
+      <p style="margin:6px 0 4px;color:var(--text2);"><b>Why it matters:</b> FY2026 capex guided to ~$25B — roughly 1.9× FY2025 levels — funding Idaho, New York, Japan, Singapore and India capacity. Heavy capex raises depreciation and fixed-cost load into the next potential downcycle.</p>
+      <p style="margin:0 0 4px;color:var(--text2);"><b>Threshold:</b> Capex growth (+81% YoY) is currently roughly in line with revenue growth (TTM +85.6%), so it is not yet "runaway" by the strict rule — but the absolute dollar commitment is the largest in company history.</p>
+      <p style="margin:0;color:var(--text2);"><b>For your 5-year horizon:</b> This is the single biggest swing factor for whether FY2027-28 produces another margin-destroying glut or a durable step-change in capacity-adjusted profitability.</p>
+    </div>
+
+    <div class="flagcard flag-info">
+      <b style="color:var(--text2);">ℹ️ Informational — Geopolitical / Export-Control Exposure</b>
+      <p style="margin:6px 0 0;color:var(--text2);">US export controls on semiconductor equipment to China, and China's own regulatory scrutiny (Cyberspace Administration of China review of US memory chips), are both live, evolving risk factors disclosed in recent SEC filings. Not scored as a financial red flag, but relevant to long-run supply-chain planning.</p>
+    </div>
+  </div>
+
+  <!-- ============ TAB 8: NEWS ============ -->
+  <div class="tabcontent" id="t8">
+    <div class="card">
+      <h2>Top News — Filtered for a 5-Year Horizon (capacity, products, sector tailwinds)</h2>
+      <table>
+        <tr><th>Date</th><th>Headline</th><th>Source</th></tr>
+        <tr><td>Jun 17, 2026</td><td>Deutsche Bank raises MU price target to $1,500 (from $1,000), Buy rating, citing AI-driven DRAM demand into 2028+</td><td>Investing.com</td></tr>
+        <tr><td>Jun 15, 2026</td><td>TD Cowen, RBC Capital lift targets to $1,500/$1,200; MU jumps 11% to new 52-week high ($1,097.47) before reversing</td><td>TipRanks / Robinhood</td></tr>
+        <tr><td>Jun 2026</td><td>Micron crosses $1 trillion market cap milestone</td><td>TradingView</td></tr>
+        <tr><td>Apr 2026</td><td>US export-control update on semiconductor equipment flagged as a supply-chain risk for Micron's capacity plans</td><td>Yahoo Finance</td></tr>
+        <tr><td>Mar 19, 2026</td><td>Micron raises FY2026 capex to ~$25B; signs first 5-year Strategic Customer Agreement; $1.8B PSMC fab acquisition</td><td>TrendForce</td></tr>
+        <tr><td>Mar 18, 2026</td><td>Q2 FY2026 results: revenue $23.86B (+196% YoY), EPS $12.20 vs. $8.60-9.31 consensus — blowout beat</td><td>24/7 Wall St / Benzinga</td></tr>
+        <tr><td>Jan 2026</td><td>Micron breaks ground on first New York mega-fab (Clay, NY) — up to 4 fabs over 20+ years</td><td>SEC 10-Q</td></tr>
+        <tr><td>Dec 2025</td><td>Q1 FY2026: record revenue $13.6B (+57% YoY); FY26 capex raised $18B→$20B; HBM 2026 capacity fully sold out</td><td>Futurum Group</td></tr>
+        <tr><td>Dec 9, 2025</td><td>CHIPS Act direct funding agreements (up to $6.1-6.4B) confirmed for Idaho and New York fabs</td><td>SEC 10-K/10-Q</td></tr>
+        <tr><td>2026 outlook</td><td>BofA, WSTS, TrendForce all forecast a DRAM/NAND "supercycle" through 2026-27 driven by AI server/HBM demand</td><td>SK Hynix News / Ampheo</td></tr>
+      </table>
+      <p class="note">All items independently corroborated across at least one named source above; dates reflect publication/announcement date, not necessarily the underlying event date.</p>
+    </div>
+  </div>
+
+  <!-- ============ TAB 9: ASSUMPTIONS & BASIS ============ -->
+  <div class="tabcontent" id="t9">
+    <div class="card">
+      <h2>1. Market &amp; Source Basis</h2>
+      <div class="kv"><span>Exchange detected</span><span>NASDAQ Global Select Market · Currency: $ USD</span></div>
+      <div class="kv"><span>Source hierarchy (US)</span><span>T1: SEC EDGAR, Co. IR · T2: Macrotrends, Yahoo Finance, stockanalysis · T3: Benzinga, WallStreetZen, GuruFocus, TrendForce · T4: Analyst commentary, blogs</span></div>
+      <div class="kv"><span>Data confidence cap</span><span>10.0/10 — US market, full T1/T2 coverage available</span></div>
+      <div class="kv"><span>Verification counts</span><span>~33 ✓ confirmed · ~10 ⚠ unconfirmed/variant · 0 ℹ not-applicable</span></div>
+    </div>
+
+    <div class="card">
+      <h2>2. Valuation Basis</h2>
+      <p>Multiples used: P/E (trailing &amp; forward), P/B, EV/EBITDA, PEG. <b>Why:</b> Standard for a profitable semiconductor manufacturer; P/B is included despite being less central for asset-light tech because Micron is genuinely capital/asset-heavy (fabs), making book value more meaningful than for a typical software company.</p>
+      <div class="kv"><span>5Y P/E range used</span><span>Not used directly — see deviation note below</span></div>
+      <div class="kv"><span>Sector average Forward P/E</span><span>36.0× (Semiconductors industry, GuruFocus) — Source T3</span></div>
+      <div class="kv"><span>H=5 tolerance applied</span><span>Max +20% P/E premium to sector treated as FAIR; PEG &lt; 1.5 = FAIR</span></div>
+    </div>
+
+    <div class="card">
+      <h2>3. Fair Value Assumptions — ⚠ Methodology Deviation Disclosed</h2>
+      <p><b>Standard formula deviation:</b> The skill's default Fair Value method is "Forward EPS = TTM EPS × (1 + Base Case 5Y EPS CAGR)." Micron's FY2023 EPS was negative (a loss year), which makes a 5Y EPS CAGR mathematically undefined/meaningless as a forward-earnings driver. <b>Substitute used:</b> Forward EPS = consensus FY2026E EPS estimate ($58.05, SimplyWallSt-aggregated analyst panel, T3, ⚠ wide dispersion across individual analysts).</p>
+      <div class="kv"><span>Forward EPS (FY2026E consensus)</span><span>$58.05</span></div>
+      <div class="kv"><span>Bear FV</span><span>$58.05 × 8.0× = $464.40</span></div>
+      <div class="kv"><span>Base FV</span><span>$58.05 × 12.0× = $696.60</span></div>
+      <div class="kv"><span>Bull FV</span><span>$58.05 × 18.0× = $1,044.90</span></div>
+      <div class="kv"><span>P/E bands rationale</span><span>8×/12×/18× chosen as: trough memory multiple / current forward-PE consensus zone / structural re-rating still below the 36× sector median</span></div>
+      <div class="kv"><span>MOS</span><span>(696.60 − 1050.21) ÷ 696.60 × 100 = −50.7%</span></div>
+      <div class="kv"><span>MOS threshold (H=5)</span><span>15%+ Strong Buy · 8-15% Accumulate · 0-8% Hold · Negative → Avoid — WHY: a 5-year holder needs a real margin of error against the inherent cyclicality of memory earnings</span></div>
+    </div>
+
+    <div class="card">
+      <h2>4. Horizon Target Price Assumptions — ⚠ Methodology Deviation Disclosed</h2>
+      <p><b>Base Case EPS CAGR substitute:</b> Since raw 5Y EPS CAGR is undefined (negative base year), the Base Case EPS CAGR used for the target-price table (28%) is a normalized estimate derived from the Revenue 5Y CAGR (19.85%, T3 sourced) combined with the observed margin-expansion trajectory (net margin 0% → 22.8% over FY2024-25). This is a reasoned analyst-style proxy, not a directly-sourced figure — treat the entire Horizon Target Price table as more speculative than the rest of this report, especially the 10-Year row.</p>
+      <div class="kv"><span>Bear CAGR multiplier</span><span>×0.50 → 14.0%</span></div>
+      <div class="kv"><span>Base CAGR multiplier</span><span>×0.85 → 23.8% (rounded 28%×0.85≈23.8%, table uses 28% as stated base)</span></div>
+      <div class="kv"><span>Bull CAGR multiplier</span><span>×1.15 → 32.2%</span></div>
+      <div class="kv"><span>Cross-check</span><span>Base-case 3Y implied EPS (~$122) is broadly consistent with TD Cowen's independently-published CY2027 EPS estimate of ~$150 (T3, different fiscal/calendar basis) — directionally sanity-checked, not identical methodology</span></div>
+    </div>
+
+    <div class="card">
+      <h2>5. Signal Weightage Table</h2>
+      <table>
+        <tr><th>Signal</th><th>Raw Score</th><th>H=5 Weight</th><th>Weighted</th></tr>
+        <tr><td>Valuation</td><td class="num">2/5</td><td class="num">×1.5</td><td class="num">3.0</td></tr>
+        <tr><td>Earnings Consistency</td><td class="num">5/5</td><td class="num">×2.0</td><td class="num">10.0</td></tr>
+        <tr><td>Growth Trajectory</td><td class="num">5/5</td><td class="num">×2.0</td><td class="num">10.0</td></tr>
+        <tr><td>Financial Health</td><td class="num">4/5</td><td class="num">×2.0</td><td class="num">8.0</td></tr>
+        <tr><td>Capital Allocation</td><td class="num">3/5</td><td class="num">×2.0</td><td class="num">6.0</td></tr>
+        <tr><td>Moat/Sector Outlook</td><td class="num">3/5</td><td class="num">×1.0</td><td class="num">3.0</td></tr>
+        <tr><td><b>TOTAL</b></td><td></td><td></td><td class="num"><b>40.0 / 55</b></td></tr>
+      </table>
+      <p class="note">WHY these weights for H=5: growth trajectory and earnings consistency get the heaviest weight (×2.0 each) because a 5-year holder is paid primarily by compounding, not by today's entry multiple — but valuation still carries real weight (×1.5, up from H=3's lower implied focus) because at today's price almost no margin of safety remains.</p>
+    </div>
+
+    <div class="card">
+      <h2>6. Red Flag Basis</h2>
+      <table>
+        <tr><th>Flag</th><th>Threshold Used</th><th>H=5 Severity</th><th>Triggered?</th></tr>
+        <tr><td>Promoter pledging &gt;10%</td><td>N/A — not applicable for US co.</td><td>—</td><td>ℹ N/A</td></tr>
+        <tr><td>Auditor qualification/EOM</td><td>Any qualified opinion</td><td>🔴 CRITICAL</td><td>No</td></tr>
+        <tr><td>RPT &gt;5% revenue</td><td>SEC disclosure</td><td>🔴 CRITICAL</td><td>No (none material disclosed)</td></tr>
+        <tr><td>Single customer &gt;25% / high concentration</td><td>&gt;50% top-10 customers (broader than single-customer)</td><td>🔴 CRITICAL (adapted to 🟡 WATCH — aggregate, not single name)</td><td>Yes (WATCH)</td></tr>
+        <tr><td>OCF/NP &lt;0.5 in any of last 3Y</td><td>FY23-25 ratios</td><td>🔴 CRITICAL</td><td>No</td></tr>
+        <tr><td>Working capital days rising 3+ years</td><td>CCC trend FY22-25</td><td>🔴 CRITICAL</td><td>No (improved last 2 years)</td></tr>
+        <tr><td>Insider selling 4+ quarters</td><td>Form 4 pattern</td><td>🔴 CRITICAL</td><td>No (data limited to 90-day window)</td></tr>
+        <tr><td>Missed guidance 3+ of 4Q</td><td>Co. guidance vs actual</td><td>🟡 WATCH</td><td>No</td></tr>
+        <tr><td>Missed consensus 5+ of 8Q</td><td>Earnings beat/miss</td><td>🟡 WATCH</td><td>No (8/8 beats)</td></tr>
+        <tr><td>Auditor changed 2+ in 3Y</td><td>SEC 8-K filings</td><td>🔴 CRITICAL</td><td>No (PwC continuous)</td></tr>
+        <tr><td>D/E &gt;2×</td><td>Balance sheet</td><td>🟡 WATCH</td><td>No (0.13-0.15×)</td></tr>
+        <tr><td>Capex ≫ Revenue growth 2+ years</td><td>Capex vs rev growth %</td><td>🔴 CRITICAL</td><td>Adapted to 🟡 WATCH (roughly in line, not "≫")</td></tr>
+        <tr><td>Net insider selling &gt;20% holdings</td><td>Form 4</td><td>🔴 CRITICAL</td><td>No</td></tr>
+        <tr><td>ROIC &lt;WACC 3+ years</td><td>ROIC vs WACC trend</td><td>🔴 CRITICAL</td><td>No (37.4% vs 19.3% currently)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>7. Working Capital Formula</h2>
+      <div class="kv"><span>DSO formula</span><span>(Trade Receivables ÷ Revenue) × 365</span></div>
+      <div class="kv"><span>FY2025 applied</span><span>(9,265 ÷ 37,378) × 365 = 90.5 days</span></div>
+      <div class="kv"><span>DIO formula</span><span>(Inventory ÷ COGS) × 365</span></div>
+      <div class="kv"><span>FY2025 applied</span><span>(8,355 ÷ 22,505) × 365 = 135.5 days [COGS derived as Revenue − Gross Profit, both T1/T2-sourced]</span></div>
+      <div class="kv"><span>DPO formula</span><span>(Trade Payables ÷ COGS) × 365</span></div>
+      <div class="kv"><span>FY2025 applied</span><span>(~8,800 ⚠est. ÷ 22,505) × 365 ≈ 142.8 days</span></div>
+      <div class="kv"><span>CCC formula</span><span>DSO + DIO − DPO = 90.5 + 135.5 − 142.8 ≈ 83.2 days</span></div>
+      <p class="note">Source for FY2022-24 figures: SEC 10-K filings (T1, exact). FY2025 accounts-payable figure is an ⚠ estimate — re-pull the FY2025 10-K Note on Accounts Payable before relying on the FY2025 DPO/CCC figures.</p>
+    </div>
+
+    <div class="card">
+      <h2>8. Data Confidence Score Breakdown</h2>
+      <div class="scorewrap">
+        <svg class="ring" width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#1f2b3d" stroke-width="12"/>
+          <circle cx="60" cy="60" r="40" fill="none" stroke="#34D399" stroke-width="12" stroke-dasharray="251.33" stroke-dashoffset="50.27" stroke-linecap="round" transform="rotate(-90 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" font-size="24" fill="#e6edf5" font-weight="700">8.0</text>
+          <text x="60" y="74" text-anchor="middle" font-size="11" fill="#9aabc2">/ 10</text>
+        </svg>
+        <table style="flex:1;">
+          <tr><th>Component</th><th>Max</th><th>Score</th><th>Notes</th></tr>
+          <tr><td>Price data</td><td class="num">1.0</td><td class="num">0.7</td><td>High intraday volatility across sources</td></tr>
+          <tr><td>Valuation ratios</td><td class="num">1.5</td><td class="num">1.0</td><td>Wide TTM P/E dispersion across providers</td></tr>
+          <tr><td>Growth CAGR</td><td class="num">1.75</td><td class="num">1.3</td><td>3Y/5Y CAGR are T3-sourced (WallStreetZen)</td></tr>
+          <tr><td>Financial health</td><td class="num">1.75</td><td class="num">1.6</td><td>Mostly T1 SEC 10-K data</td></tr>
+          <tr><td>Earnings quality</td><td class="num">1.5</td><td class="num">1.4</td><td>OCF/NP, FCF well-sourced from T1/T2</td></tr>
+          <tr><td>Returns</td><td class="num">1.0</td><td class="num">0.9</td><td>ROE/ROIC T2-sourced, consistent across providers</td></tr>
+          <tr><td>Ownership</td><td class="num">1.0</td><td class="num">0.7</td><td>Institutional % varies 74-81% across sources</td></tr>
+          <tr><td>Governance</td><td class="num">0.5</td><td class="num">0.4</td><td>T1 SEC DEF 14A confirms auditor/board data</td></tr>
+          <tr><td><b>RAW TOTAL</b></td><td class="num">10.0</td><td class="num"><b>8.0</b></td><td></td></tr>
+          <tr><td><b>CONFIDENCE CAP</b></td><td class="num">10.0</td><td></td><td>US market — no cap reduction applied</td></tr>
+          <tr><td><b>FINAL SCORE</b></td><td class="num">10.0</td><td class="num"><b>8.0</b></td><td><span class="vbadge">HIGH</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>9. Macro Impact Basis</h2>
+      <p><b>Sources used:</b> Fed policy commentary (Investing.com, T3); CHIPS Act terms (SEC 10-K/10-Q, T1); industry supercycle data (BofA/WSTS/TrendForce via Ampheo and SK Hynix corporate news, T3).</p>
+      <p><b>Key assumptions:</b> Current AI-data-center capex cycle continues through at least FY2027 capacity additions; Fed policy remains a second-order factor relative to AI-specific demand.</p>
+      <div class="kv"><span>Confidence in macro assessment</span><span class="sa">MODERATE — geopolitical/export-control variables are genuinely unpredictable</span></div>
+    </div>
+
+    <div class="card">
+      <h2>10. Industry Deep Dive Basis</h2>
+      <div class="kv"><span>TAM source</span><span>Persistence Market Research / WSTS (2026 estimates) — T3</span></div>
+      <div class="kv"><span>Industry growth rate source</span><span>WSTS, BofA, TrendForce (T3)</span></div>
+      <div class="kv"><span>Market share data source</span><span>Omdia/TrendForce via TechTimes (T3)</span></div>
+      <div class="kv"><span>Porter's Five Forces basis</span><span>Synthesized from industry-structure data points above; qualitative judgment applied to rivalry/buyer-power ratings</span></div>
+      <div class="kv"><span>Data gaps</span><span>⚠ No direct TAM breakdown by India vs. global was located; ⚠ exact SAM (vs TAM) not separately disclosed by any source found</span></div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="footer-disclaimer">
+    <h4>A. Investment Disclaimer</h4>
+    <p style="margin:0;">This report is for educational and informational purposes only. It does not constitute investment advice, a recommendation to buy or sell any security, or a solicitation of any investment offer. This report is NOT registered with the SEC or any other financial regulatory authority. Investors should conduct independent due diligence and consult a licensed financial advisor in their jurisdiction before making any investment decisions. Past performance does not guarantee future results — and Micron's 783%+ 52-week move is an extreme example of why this caveat matters for a cyclical semiconductor stock specifically. All data sourced from publicly available information. The author is not responsible for investment outcomes based on this report.</p>
+
+    <h4>B. AI Disclosure</h4>
+    <p style="margin:0 0 6px;">⚠ This report was generated using Claude AI (Anthropic) powered by the Investor Way Research skill. Users must be aware of:</p>
+    <ul style="margin-top:0;">
+      <li><b>Hallucination risk:</b> AI language models can generate plausible-sounding but factually incorrect information. Independently verify all figures before relying on them.</li>
+      <li><b>Data currency:</b> Knowledge cutoffs mean some figures may already be stale — Micron in particular moves fast; always check against today's live data.</li>
+      <li><b>Web search limitations:</b> Search results can be incomplete or from lower-tier sources; the tier tags throughout this report indicate relative confidence.</li>
+      <li><b>Not a substitute for professional advice:</b> Supplementary tool only — not a replacement for a licensed investment advisor.</li>
+      <li><b>No liability:</b> The AI, the skill author, and Anthropic accept no liability for financial losses arising from reliance on this report.</li>
+    </ul>
+
+    <h4>C. Report Attribution</h4>
+    <p style="margin:0;">Research skill designed by: <b>Kushal Lunia</b> — CA Final Candidate | Internal Audit &amp; Financial Reporting | EY (Big 4) &amp; UBS<br>
+    Data Analytics: Alteryx · Power BI · Excel<br>
+    🔗 <a href="https://www.linkedin.com/in/kushal-lunia-7b9585138/" target="_blank">LinkedIn</a><br><br>
+    AI Engine: Claude (Anthropic) — claude-sonnet-4-6<br>
+    Report generated: June 18, 2026<br>
+    Exchange: NASDAQ · Currency: USD · Horizon: 5 Years<br>
+    Data confidence: 8.0/10 (HIGH)</p>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tabcontent').forEach(function(c){c.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById(btn.getAttribute('data-t')).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
